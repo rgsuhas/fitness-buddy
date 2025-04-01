@@ -1,3 +1,6 @@
+/* Ensure Tailwind CSS is properly configured in your project. */
+/* Install Tailwind CSS and include it in your PostCSS configuration. */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -59,7 +62,15 @@
 
 @layer base {
   * {
-    @apply border-border;
+    /* Ensure this matches your Tailwind config */
+    @apply border-neutral-300; /* Replace border-border */
+  }
+  .border-neutral-300 {
+    /* Ensure this matches your Tailwind config */
+    border-color: theme('colors.neutral.300');
+  }
+  .border-custom {
+    border-color: hsl(var(--border)); /* Define custom class for --border */
   }
   body {
     @apply bg-background text-foreground;

@@ -22,6 +22,9 @@ interface Workout {
 export function WorkoutRecommendations() {
   const { toast } = useToast()
 
+  // TODO: Add API endpoint: GET /api/workouts/recommendations
+  // Expected response: { workouts: Workout[] }
+  // This should fetch personalized workout recommendations based on user preferences
   const [workouts, setWorkouts] = useState<Workout[]>([
     {
       id: "rec1",
@@ -55,32 +58,36 @@ export function WorkoutRecommendations() {
 
   const handleGenerateCustomWorkout = async () => {
     try {
-      // Simulate API call to AI service
       toast({
         title: "Generating workout...",
         description: "Our AI is creating a personalized workout plan for you.",
+        variant: "default",
       })
 
-      // Simulate delay
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const response = await fetch('http://localhost:4000/api/workouts/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userPreferences: {
+            fitnessLevel: 'intermediate',
+            goals: ['strength', 'endurance'],
+            equipment: ['dumbbells', 'bodyweight'],
+            timeAvailable: 50
+          }
+        })
+      })
 
-      // Add new workout to the beginning of the list
-      const newWorkout = {
-        id: `rec${Date.now()}`,
-        title: "Custom Full Body Routine",
-        description: "AI-generated full body workout based on your recent progress and goals",
-        level: "intermediate",
-        duration: 50,
-        category: "Full Body",
-        imageUrl: "/images/workout-4.jpg",
-        aiGenerated: true,
+      if (!response.ok) {
+        throw new Error('Failed to generate workout')
       }
 
-      setWorkouts([newWorkout, ...workouts])
+      const data = await response.json()
+      setWorkouts([data, ...workouts])
 
       toast({
         title: "Custom workout created!",
         description: "Your personalized workout plan is now ready.",
+        variant: "default",
       })
     } catch (error) {
       console.error("Error generating workout:", error)
@@ -151,4 +158,3 @@ export function WorkoutRecommendations() {
     </div>
   )
 }
-

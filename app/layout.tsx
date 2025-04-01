@@ -1,5 +1,5 @@
 import type React from "react"
-import { Mona_Sans as FontSans } from "next/font/google"
+import { Inter as FontSans } from "next/font/google"
 import { Toaster } from "@/components/ui/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Sidebar } from "@/components/sidebar"
@@ -27,7 +27,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning className="dark">
       <body className={`font-sans antialiased ${fontSans.variable}`}>
         <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <ThemeProvider>
             <div className="min-h-screen flex flex-col">
               <Header />
               <div className="flex flex-1">

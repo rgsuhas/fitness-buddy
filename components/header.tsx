@@ -90,11 +90,12 @@ export default function Header() {
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="relative rounded-full" aria-label="User menu">
+                      <Button variant="ghost" size="icon" className="relative rounded-full">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user.image} alt={user.name} />
-                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                          <AvatarImage src={user?.image} alt={user?.name ?? 'User avatar'} />
+                          <AvatarFallback>{user?.name?.[0] ?? '?'}</AvatarFallback>
                         </Avatar>
+                        <span className="sr-only">Open user menu</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56">
@@ -102,17 +103,23 @@ export default function Header() {
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
                         <DropdownMenuItem asChild>
-                          <Link href="/profile">Profile</Link>
+                          <Link href="/profile" className="w-full flex">Profile</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/dashboard">Dashboard</Link>
+                          <Link href="/dashboard" className="w-full flex">Dashboard</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                          <Link href="/settings">Settings</Link>
+                          <Link href="/settings" className="w-full flex">Settings</Link>
                         </DropdownMenuItem>
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => logout()} className="text-destructive focus:text-destructive">
+                      <DropdownMenuItem
+                        onSelect={(event) => {
+                          event.preventDefault();
+                          logout();
+                        }}
+                        className="text-destructive focus:text-destructive cursor-pointer"
+                      >
                         Log out
                       </DropdownMenuItem>
                     </DropdownMenuContent>

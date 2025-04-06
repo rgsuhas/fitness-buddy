@@ -2,9 +2,6 @@
 
 FitnessBuddy is a comprehensive social fitness application designed to help users achieve their fitness goals through personalized workout plans, progress tracking, community engagement, and social features. The app provides a complete fitness ecosystem with secure authentication, customizable workouts, interactive progress visualization, and a vibrant community to keep you motivated.
 
-<p align="center">
-  <img src="public/images/logo.png" alt="FitnessBuddy Logo" width="200"/>
-</p>
 
 ## Table of Contents
 

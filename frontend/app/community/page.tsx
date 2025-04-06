@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,12 +9,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Heart, MessageSquare, Share2, ChevronUp, UserPlus, Trophy, Target, Search, Filter, Plus } from "lucide-react"
+import { Heart, MessageSquare, Share2, ChevronUp, UserPlus, Trophy, Target, Search, Filter, Plus, Image, Send } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { useUser } from "@/lib/hooks/use-user"
 import { communityService, type Post } from "@/lib/services/community"
 import { PlaceholderImage } from "@/components/ui/placeholder-image"
 import { formatTimeAgo } from "@/lib/utils/date"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 interface FitnessBuddy {
   id: string
@@ -59,6 +62,11 @@ export default function CommunityPage() {
   const [page, setPage] = useState<number>(1)
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [total, setTotal] = useState<number>(0)
+  const [isCreatingPost, setIsCreatingPost] = useState<boolean>(false)
+  const [newPost, setNewPost] = useState({ title: "", content: "", image: null as File | null })
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     // Update the active tab when the URL parameter changes
@@ -66,8 +74,6 @@ export default function CommunityPage() {
       setActiveTab(tabParam)
     }
   }, [tabParam])
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -77,8 +83,13 @@ export default function CommunityPage() {
       }
 
       try {
-        const response = await communityService.getPosts(page)
-        const formattedPosts: PostWithMeta[] = response.posts.map((post: Post) => ({
+        setLoading(true)
+        const response = await fetch(`/api/community?page=${page}&limit=10`)
+        if (!response.ok) throw new Error('Failed to fetch posts')
+        
+        const data = await response.json()
+        
+        const formattedPosts: PostWithMeta[] = data.posts.map((post: Post) => ({
           ...post,
           timeAgo: formatTimeAgo(new Date(post.createdAt)),
           liked: post.likes.includes(user?.id || '')
@@ -90,8 +101,8 @@ export default function CommunityPage() {
           setPosts((prev: PostWithMeta[]) => [...prev, ...formattedPosts])
         }
 
-        setTotal(response.total)
-        setHasMore(page * 10 < response.total)
+        setTotal(data.total)
+        setHasMore(page * 10 < data.total)
         setLoading(false)
       } catch (error) {
         console.error('Failed to fetch posts:', error)
@@ -105,7 +116,7 @@ export default function CommunityPage() {
     }
 
     fetchData()
-  }, [page, user?.id, toast, activeTab])
+  }, [activeTab, page, user?.id, toast])
 
   useEffect(() => {
     const fetchBuddiesAndChallenges = async () => {
@@ -189,6 +200,181 @@ export default function CommunityPage() {
     fetchBuddiesAndChallenges()
   }, [activeTab, toast])
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+    if (!validTypes.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Only JPEG, PNG, GIF, and WebP images are allowed",
+        variant: "destructive"
+      })
+      return
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (file.size > maxSize) {
+      toast({
+        title: "File too large",
+        description: "Image size must be less than 5MB",
+        variant: "destructive"
+      })
+      return
+    }
+
+    setNewPost({ ...newPost, image: file })
+
+    // Create preview
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleCreatePost = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to create a post",
+        variant: "destructive"
+      })
+      return
+    }
+
+    if (!newPost.title.trim() || !newPost.content.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please provide both a title and content for your post",
+        variant: "destructive"
+      })
+      return
+    }
+
+    try {
+      setIsSubmitting(true)
+
+      let imageUrl = undefined
+
+      // Upload image if present
+      if (newPost.image) {
+        const formData = new FormData()
+        formData.append('file', newPost.image)
+
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData
+        })
+
+        if (!uploadResponse.ok) {
+          throw new Error('Failed to upload image')
+        }
+
+        const uploadData = await uploadResponse.json()
+        imageUrl = uploadData.url
+      }
+
+      // Create post
+      const response = await fetch('/api/community', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          title: newPost.title,
+          content: newPost.content,
+          imageUrl,
+          userId: user.id,
+          tags: ['fitness', 'community']
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create post')
+      }
+
+      const newPostData = await response.json()
+      
+      // Add to posts list
+      const formattedNewPost: PostWithMeta = {
+        ...newPostData,
+        timeAgo: 'Just now',
+        liked: false
+      }
+
+      setPosts([formattedNewPost, ...posts])
+      
+      // Reset form
+      setNewPost({ title: "", content: "", image: null })
+      setImagePreview(null)
+      setIsCreatingPost(false)
+      
+      toast({
+        title: "Success",
+        description: "Your post has been published",
+      })
+    } catch (error) {
+      console.error('Failed to create post:', error)
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive"
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleLikePost = async (postId: string) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "Please log in to like posts",
+        variant: "destructive"
+      })
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/community/${postId}/like`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ userId: user.id })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to like post')
+      }
+
+      const data = await response.json()
+      
+      // Update posts state
+      setPosts(posts.map(post => {
+        if (post._id === postId) {
+          return {
+            ...post,
+            likes: data.likes,
+            liked: data.likes.includes(user.id)
+          }
+        }
+        return post
+      }))
+    } catch (error) {
+      console.error('Failed to like post:', error)
+      toast({
+        title: "Error",
+        description: "Failed to like post",
+        variant: "destructive"
+      })
+    }
+  }
+
   const handleFollowBuddy = async (buddyId: string) => {
     try {
       setBuddies(
@@ -242,36 +428,12 @@ export default function CommunityPage() {
 
   const handleTabChange = (value: string) => {
     setActiveTab(value)
-    router.push(`/community?tab=${value}`)
+    router.push(`/community?tab=${value}`, { scroll: false })
   }
 
-  const handleLikePost = async (postId: string) => {
-    try {
-      await communityService.togglePostLike(postId)
-      setPosts(
-        posts.map((post: PostWithMeta) => {
-          if (post._id === postId) {
-            const liked = !post.liked
-            return {
-              ...post,
-              liked,
-              likes: liked ? [...post.likes, user?.id || ''] : post.likes.filter((id: string) => id !== user?.id)
-            }
-          }
-          return post
-        })
-      )
-      toast({
-        title: "Success",
-        description: "Post like status updated",
-      })
-    } catch (error) {
-      console.error('Failed to update post like:', error)
-      toast({
-        title: "Error",
-        description: "Failed to update post like status",
-        variant: "destructive"
-      })
+  const handleLoadMore = () => {
+    if (hasMore && !loading) {
+      setPage(page + 1)
     }
   }
 

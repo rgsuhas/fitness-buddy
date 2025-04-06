@@ -56,7 +56,41 @@ export default function MessagesPage() {
   const [activeConversation, setActiveConversation] = useState<string | null>(null)
   const [activeUser, setActiveUser] = useState<Conversation["user"] | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagePollingInterval = useRef<NodeJS.Timeout>()
+  const conversationPollingInterval = useRef<NodeJS.Timeout>()
+
+  // Auto-scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
+  }, [messages])
+
+  // Poll for new messages
+  useEffect(() => {
+    if (activeConversation) {
+      const pollMessages = async () => {
+        try {
+          const response = await axios.get(`/api/messages/${activeConversation}`)
+          setMessages(response.data)
+        } catch (error) {
+          console.error("Error polling messages:", error)
+        }
+      }
+
+      messagePollingInterval.current = setInterval(pollMessages, 5000)
+
+      return () => {
+        if (messagePollingInterval.current) {
+          clearInterval(messagePollingInterval.current)
+        }
+      }
+    }
+  }, [activeConversation])
 
   // Redirect if not logged in
   useEffect(() => {
@@ -68,9 +102,11 @@ export default function MessagesPage() {
   // Fetch conversations
   useEffect(() => {
     const fetchConversations = async () => {
+      if (!user || !user.id) return;
+      
       try {
         setIsLoading(true)
-        const response = await axios.get("/api/messages/conversations")
+        const response = await axios.get(`/api/messages/conversations?userId=${user.id}`)
         setConversations(response.data)
         setIsLoading(false)
       } catch (error) {
@@ -84,10 +120,27 @@ export default function MessagesPage() {
       }
     }
 
-    if (user) {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    if (user && user.id) {
+      // Initial fetch
       fetchConversations()
+      
+      // Only set up polling if we're not already polling
+      if (!conversationPollingInterval.current) {
+        // Set up polling with a reasonable interval (every 30 seconds)
+        intervalId = setInterval(fetchConversations, 30000)
+        conversationPollingInterval.current = intervalId
+      }
     }
-  }, [user, toast])
+    
+    // Clean up function
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId)
+      }
+    }
+  }, [user, toast]) // Only re-run when user or toast changes
 
   // Fetch messages when active conversation changes
   useEffect(() => {
@@ -99,16 +152,18 @@ export default function MessagesPage() {
         setMessages(response.data)
         
         // Mark messages as read
-        await axios.put(`/api/messages/${activeConversation}/read`)
-        
-        // Update unread status in conversations
-        setConversations(prevConversations => 
-          prevConversations.map(conv => 
-            conv.user.id === activeConversation 
-              ? { ...conv, lastMessage: { ...conv.lastMessage, unread: false } } 
-              : conv
+        if (user) {
+          await axios.put(`/api/messages/${activeConversation}/read?userId=${user.id}`)
+          
+          // Update unread status in conversations
+          setConversations(prevConversations => 
+            prevConversations.map(conv => 
+              conv.user.id === activeUser?.id 
+                ? { ...conv, lastMessage: { ...conv.lastMessage, unread: false } } 
+                : conv
+            )
           )
-        )
+        }
       } catch (error) {
         console.error("Error fetching messages:", error)
         toast({
@@ -120,12 +175,7 @@ export default function MessagesPage() {
     }
 
     fetchMessages()
-  }, [activeConversation, toast])
-
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+  }, [activeConversation, toast, user, activeUser])
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -218,162 +268,148 @@ export default function MessagesPage() {
   const displayConversations = conversations.length > 0 ? conversations : mockConversations
 
   return (
-    <div className="container py-6">
-      <h1 className="text-3xl font-bold mb-6">Messages</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Conversations List */}
-        <Card className="md:col-span-1">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex justify-between items-center">
-              <span>Conversations</span>
-              <Button variant="ghost" size="icon">
-                <Users className="h-4 w-4" />
-              </Button>
-            </CardTitle>
-            <div className="relative">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search conversations..." className="pl-8" />
+    <div className="container py-8">
+      <Card className="w-full h-[80vh]">
+        <CardHeader>
+          <CardTitle>Messages</CardTitle>
+        </CardHeader>
+        <CardContent className="p-0 flex h-[calc(80vh-4rem)]">
+          <div className="w-1/3 border-r h-full flex flex-col">
+            <div className="p-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search conversations..."
+                  className="pl-9"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <ScrollArea className="h-[500px]">
-              {isLoading ? (
-                <div className="p-4 space-y-4">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <div key={i} className="flex items-center space-x-4">
-                      <Skeleton className="h-10 w-10 rounded-full" />
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-24" />
-                        <Skeleton className="h-3 w-40" />
+            <ScrollArea className="flex-1">
+              <div className="space-y-2 p-4">
+                {isLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-center space-x-4 p-3">
+                      <Skeleton className="h-12 w-12 rounded-full" />
+                      <div className="space-y-2 flex-1">
+                        <Skeleton className="h-4 w-[200px]" />
+                        <Skeleton className="h-4 w-[160px]" />
                       </div>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="divide-y">
-                  {displayConversations.map((conversation) => (
-                    <div
-                      key={conversation.user.id}
-                      className={`p-4 cursor-pointer hover:bg-accent transition-colors ${
-                        activeConversation === conversation.user.id ? "bg-accent" : ""
-                      }`}
-                      onClick={() => selectConversation(conversation)}
-                    >
-                      <div className="flex items-center space-x-4">
+                  ))
+                ) : (
+                  conversations
+                    .filter((conv) =>
+                      conv.user.name.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((conversation) => (
+                      <button
+                        key={conversation.user.id}
+                        onClick={() => {
+                          setActiveConversation(conversation.user.id)
+                          setActiveUser(conversation.user)
+                        }}
+                        className={`w-full flex items-center space-x-4 p-3 rounded-lg transition-colors ${
+                          activeConversation === conversation.user.id
+                            ? "bg-primary/10"
+                            : "hover:bg-muted"
+                        }`}
+                      >
                         <Avatar>
-                          <AvatarImage src={conversation.user.avatar} alt={conversation.user.name} />
-                          <AvatarFallback>{conversation.user.name[0]}</AvatarFallback>
+                          <AvatarImage src={conversation.user.avatar} />
+                          <AvatarFallback>
+                            <User className="h-6 w-6" />
+                          </AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 space-y-1">
-                          <div className="flex items-center justify-between">
+                        <div className="flex-1 text-left">
+                          <div className="flex justify-between">
                             <p className="font-medium">{conversation.user.name}</p>
                             <span className="text-xs text-muted-foreground">
-                              {format(new Date(conversation.lastMessage.timestamp), "h:mm a")}
+                              {format(new Date(conversation.lastMessage.timestamp), "HH:mm")}
                             </span>
                           </div>
                           <p className="text-sm text-muted-foreground truncate">
                             {conversation.lastMessage.content}
                           </p>
+                          {conversation.lastMessage.unread && (
+                            <Badge variant="default" className="mt-1">New</Badge>
+                          )}
                         </div>
-                        {conversation.lastMessage.unread && (
-                          <Badge className="ml-auto" variant="default">
-                            New
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                      </button>
+                    ))
+                )}
+              </div>
             </ScrollArea>
-          </CardContent>
-        </Card>
-
-        {/* Chat Area */}
-        <Card className="md:col-span-2">
-          {activeConversation ? (
-            <>
-              <CardHeader className="pb-2 border-b">
-                <div className="flex items-center space-x-4">
+          </div>
+          <div className="flex-1 flex flex-col">
+            {activeUser ? (
+              <>
+                <div className="p-4 border-b flex items-center space-x-4">
                   <Avatar>
-                    <AvatarImage src={activeUser?.avatar} alt={activeUser?.name} />
-                    <AvatarFallback>{activeUser?.name[0]}</AvatarFallback>
+                    <AvatarImage src={activeUser.avatar} />
+                    <AvatarFallback>
+                      <User className="h-6 w-6" />
+                    </AvatarFallback>
                   </Avatar>
                   <div>
-                    <CardTitle>{activeUser?.name}</CardTitle>
-                    <p className="text-sm text-muted-foreground">Online</p>
+                    <p className="font-medium">{activeUser.name}</p>
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="p-0">
-                <ScrollArea className="h-[400px] p-4">
+                <ScrollArea className="flex-1 p-4">
                   <div className="space-y-4">
-                    {messages.length > 0 ? (
-                      messages.map((message) => {
-                        const isCurrentUser = message.sender._id === user?.id
-                        return (
-                          <div
-                            key={message._id}
-                            className={`flex ${isCurrentUser ? "justify-end" : "justify-start"}`}
-                          >
-                            <div className="flex items-end gap-2">
-                              {!isCurrentUser && (
-                                <Avatar className="h-8 w-8">
-                                  <AvatarImage src={message.sender.avatar} alt={message.sender.name} />
-                                  <AvatarFallback>{message.sender.name[0]}</AvatarFallback>
-                                </Avatar>
-                              )}
-                              <div
-                                className={`max-w-md rounded-lg p-3 ${
-                                  isCurrentUser
-                                    ? "bg-primary text-primary-foreground"
-                                    : "bg-muted"
-                                }`}
-                              >
-                                <p>{message.content}</p>
-                                <p className="text-xs mt-1 opacity-70">
-                                  {format(new Date(message.timestamp), "h:mm a")}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )
-                      })
-                    ) : (
-                      <div className="flex items-center justify-center h-full">
-                        <p className="text-muted-foreground">No messages yet. Start the conversation!</p>
+                    {messages.map((message) => (
+                      <div
+                        key={message._id}
+                        className={`flex ${
+                          message.sender._id === user?.id ? "justify-end" : "justify-start"
+                        }`}
+                      >
+                        <div
+                          className={`max-w-[70%] rounded-lg p-3 ${
+                            message.sender._id === user?.id
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          }`}
+                        >
+                          <p>{message.content}</p>
+                          <p className="text-xs mt-1 opacity-70">
+                            {format(new Date(message.timestamp), "HH:mm")}
+                          </p>
+                        </div>
                       </div>
-                    )}
+                    ))}
                     <div ref={messagesEndRef} />
                   </div>
                 </ScrollArea>
-                <form onSubmit={handleSendMessage} className="p-4 border-t">
-                  <div className="flex gap-2">
+                <div className="p-4 border-t">
+                  <form
+                    onSubmit={handleSendMessage}
+                    className="flex items-center space-x-2"
+                  >
                     <Input
-                      placeholder="Type a message..."
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
+                      placeholder="Type a message..."
                       className="flex-1"
                     />
                     <Button type="submit" size="icon">
                       <Send className="h-4 w-4" />
                     </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-[500px] text-center p-4">
-              <User className="h-16 w-16 mb-4 text-muted-foreground" />
-              <h3 className="text-xl font-medium mb-2">Select a conversation</h3>
-              <p className="text-muted-foreground max-w-md">
-                Choose a conversation from the list to start chatting
-              </p>
-            </div>
-          )}
-        </Card>
-      </div>
+                  </form>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                <div className="text-center">
+                  <Users className="h-12 w-12 mx-auto mb-4" />
+                  <p>Select a conversation to start messaging</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -58,12 +58,19 @@ export default function LoginPage() {
     }
 
     setIsSubmitting(true)
+    setFormError("")
 
     try {
+      // Add a small delay to ensure the loading state is visible
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
       const success = await login(email, password)
 
       if (success) {
         router.push("/dashboard")
+      } else {
+        // If login returns false but no error was thrown, show a generic error
+        setFormError("Invalid email or password. Please try again.")
       }
     } catch (error) {
       console.error("Login error:", error)
@@ -211,4 +218,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

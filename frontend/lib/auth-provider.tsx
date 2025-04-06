@@ -108,121 +108,104 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setLoading(true)
+      
+      // Add a small delay to ensure loading state is visible
+      await new Promise(resolve => setTimeout(resolve, 300));
 
-      // In a real app, this would be an API call
-      // Simulating API request delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      // Mock login logic (replace with actual API call)
-      if (email === "user@example.com" && password === "password") {
-        const mockUser = {
-          id: "1",
-          name: "John Doe",
-          email: "user@example.com",
-          role: "user" as const,
-          image: "/images/user-avatar.jpg",
-        }
+      const data = await response.json();
 
+      if (response.ok && data.success) {
         // Store user and token
-        localStorage.setItem("fitness_buddy_user", JSON.stringify(mockUser))
-        localStorage.setItem("fitness_buddy_token", "mock_jwt_token")
+        localStorage.setItem("fitness_buddy_user", JSON.stringify(data.user));
+        localStorage.setItem("fitness_buddy_token", data.token);
 
-        setUser(mockUser)
+        setUser(data.user);
         toast({
           title: "Welcome back!",
           description: "You've successfully logged in.",
-        })
+        });
 
-        return true
-      } else if (email === "admin@example.com" && password === "password") {
-        const mockAdmin = {
-          id: "2",
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "admin" as const,
-          image: "/images/admin-avatar.jpg",
-        }
-
-        localStorage.setItem("fitness_buddy_user", JSON.stringify(mockAdmin))
-        localStorage.setItem("fitness_buddy_token", "mock_admin_jwt_token")
-
-        setUser(mockAdmin)
-        toast({
-          title: "Welcome back, Admin!",
-          description: "You've successfully logged in.",
-        })
-
-        return true
+        return true;
       } else {
         toast({
           title: "Login failed",
-          description: "Invalid email or password. Please try again.",
+          description: data.error || "Invalid email or password. Please try again.",
           variant: "destructive",
-        })
-        return false
+        });
+        return false;
       }
     } catch (error) {
-      console.error("Login error:", error)
+      console.error("Login error:", error);
       toast({
         title: "Login failed",
         description: "An error occurred. Please try again later.",
         variant: "destructive",
-      })
-      return false
+      });
+      return false;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const register = async (name: string, email: string, password: string): Promise<boolean> => {
     try {
-      setLoading(true)
+      setLoading(true);
 
-      // In a real app, this would be an API call
-      // Simulating API request delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          name, 
+          email, 
+          password,
+          activityLevel: 'moderate' // Default to moderate activity level
+        }),
+      });
 
-      // Mock registration logic (replace with actual API call)
-      if (email === "user@example.com") {
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Store user and token
+        localStorage.setItem("fitness_buddy_user", JSON.stringify(data.user));
+        localStorage.setItem("fitness_buddy_token", data.token);
+
+        setUser(data.user);
+        toast({
+          title: "Registration successful!",
+          description: "Your account has been created.",
+        });
+
+        return true;
+      } else {
         toast({
           title: "Registration failed",
-          description: "Email already exists. Please use a different email.",
+          description: data.error || "Failed to create account. Please try again.",
           variant: "destructive",
-        })
-        return false
+        });
+        return false;
       }
-
-      // Mock successful registration
-      const newUser = {
-        id: "new_user_id",
-        name,
-        email,
-        role: "user" as const,
-        image: "/images/default-avatar.jpg",
-      }
-
-      localStorage.setItem("fitness_buddy_user", JSON.stringify(newUser))
-      localStorage.setItem("fitness_buddy_token", "mock_jwt_token")
-
-      setUser(newUser)
-      toast({
-        title: "Registration successful!",
-        description: "Your account has been created.",
-      })
-
-      return true
     } catch (error) {
-      console.error("Registration error:", error)
+      console.error("Registration error:", error);
       toast({
         title: "Registration failed",
         description: "An error occurred. Please try again later.",
         variant: "destructive",
-      })
-      return false
+      });
+      return false;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const logout = () => {
     localStorage.removeItem("fitness_buddy_user")
@@ -345,4 +328,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
-

@@ -31,7 +31,7 @@ const ChartContainer = React.forwardRef<
 ChartContainer.displayName = "ChartContainer"
 
 // Custom tooltip component for charts
-const CustomTooltip = ({ active, payload, label }: any) => {
+const ChartTooltip = ({ active, payload, label }: any) => {
   if (!active || !payload) return null
 
   return (
@@ -53,7 +53,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 }
 
 // Export the components defined in this file directly
-export { ChartContainer, CustomTooltip }
+export { ChartContainer, ChartTooltip }
 
 // Only export ChartTooltipContent from the other file
 export { ChartTooltipContent } from './chart-tooltip-content'

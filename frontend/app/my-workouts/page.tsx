@@ -15,8 +15,26 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { useToast } from "@/components/ui/use-toast"
 import { Clock, Dumbbell, Plus, Play, Edit, Trash2, BarChart3, Calendar } from "lucide-react"
 
+// Define TypeScript interfaces for our data structures
+interface Exercise {
+  name: string;
+  sets: number;
+  reps: number | string;
+  weight: string | number;
+}
+
+interface Workout {
+  id: string;
+  name: string;
+  description: string;
+  type: string;
+  duration: number;
+  exercises: Exercise[];
+  createdAt: string;
+}
+
 // Sample workout data
-const sampleWorkouts = [
+const sampleWorkouts: Workout[] = [
   {
     id: "1",
     name: "Full Body Strength",
@@ -78,12 +96,12 @@ export default function MyWorkoutsPage() {
   const { user, loading } = useUser();
   const router = useRouter();
   const { toast } = useToast();
-  const [workouts, setWorkouts] = useState(sampleWorkouts);
+  const [workouts, setWorkouts] = useState<Workout[]>(sampleWorkouts);
   const [activeTab, setActiveTab] = useState("all");
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedWorkout, setSelectedWorkout] = useState(null);
-  const [newWorkout, setNewWorkout] = useState({
+  const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+  const [newWorkout, setNewWorkout] = useState<Omit<Workout, 'id' | 'createdAt'>>({
     name: "",
     description: "",
     type: "strength",
@@ -120,7 +138,7 @@ export default function MyWorkoutsPage() {
     });
   };
 
-  const handleDeleteWorkout = (id) => {
+  const handleDeleteWorkout = (id: string) => {
     setWorkouts(workouts.filter((workout) => workout.id !== id));
     toast({
       title: "Workout Deleted",
@@ -138,7 +156,7 @@ export default function MyWorkoutsPage() {
     });
   };
 
-  const handleExerciseChange = (index, field, value) => {
+  const handleExerciseChange = (index: number, field: keyof Exercise, value: string | number) => {
     const updatedExercises = [...newWorkout.exercises];
     updatedExercises[index] = {
       ...updatedExercises[index],
@@ -151,7 +169,7 @@ export default function MyWorkoutsPage() {
     });
   };
 
-  const handleRemoveExercise = (index) => {
+  const handleRemoveExercise = (index: number) => {
     const updatedExercises = [...newWorkout.exercises];
     updatedExercises.splice(index, 1);
     

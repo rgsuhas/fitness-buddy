@@ -24,7 +24,7 @@ FitnessBuddy is a comprehensive social fitness application designed to help user
 
 FitnessBuddy is built as a modern web application with a focus on user experience, performance, and scalability. The application uses a Next.js frontend with a MongoDB database, providing a seamless fitness management experience across devices.
 
-**Live Demo:** [https://fitness-buddy-demo.vercel.app](https://fitness-buddy-demo.vercel.app) (Coming Soon)
+**Demo:** [https://drive.google.com/file/d/1DhCMAwJVL_P4KxUXp4CchL2vfdmg7ARE/view?usp=drivesdk](https://fitness-buddy-demo.vercel.app) (Coming Soon)
 
 ## Features
 

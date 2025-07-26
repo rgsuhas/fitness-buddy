@@ -121,6 +121,14 @@ export function Sidebar() {
     },
   ]
 
+  const adminItems = [
+    {
+      title: "Admin Dashboard",
+      href: "/admin/dashboard",
+      icon: Home,
+    },
+  ]
+
   return (
     <div
       className={`border-r h-full bg-muted/40 hidden md:block ${collapsed ? "w-16" : "w-64"} transition-all duration-300`}
@@ -145,6 +153,29 @@ export function Sidebar() {
               </Link>
             )
           })}
+
+          {user?.role === "admin" && (
+            <>
+              <div className="border-t border-gray-700 my-4" />
+              {adminItems.map((item) => {
+                const isActive = pathname === item.href || pathname?.startsWith(`${item.href}/`)
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center px-3 py-2 rounded-md text-sm ${
+                      isActive
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                    } ${collapsed ? "justify-center" : "justify-start"}`}
+                  >
+                    <item.icon className={`h-5 w-5 ${collapsed ? "" : "mr-3"}`} />
+                    {!collapsed && <span>{item.title}</span>}
+                  </Link>
+                )
+              })}
+            </>
+          )}
         </div>
 
         <button

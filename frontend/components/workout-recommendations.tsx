@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -64,7 +65,7 @@ export function WorkoutRecommendations() {
         variant: "default",
       })
 
-      const response = await fetch('http://localhost:4000/api/workouts/generate', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/workouts/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -117,9 +118,11 @@ export function WorkoutRecommendations() {
           <Link href={`/workouts/${workout.id}`} key={workout.id} className="group">
             <Card className="overflow-hidden transition-all duration-200 hover:shadow-md h-full flex flex-col">
               <div className="relative h-[200px] overflow-hidden">
-                <img
+                <Image
                   src={workout.imageUrl || "/placeholder.svg"}
                   alt={workout.title}
+                  layout="fill"
+                  objectFit="cover"
                   className="h-full w-full object-cover transition-all duration-300 group-hover:scale-105"
                 />
                 {workout.aiGenerated && (

@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 export function HeroBanner() {
@@ -6,10 +7,12 @@ export function HeroBanner() {
     <div className="relative isolate overflow-hidden">
       {/* Background image with overlay */}
       <div className="absolute inset-0 -z-10">
-        <img
+        <Image
           src="/images/hero-background.jpg"
           alt="People working out together"
-          className="h-full w-full object-cover"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/50 dark:from-black/90 dark:to-black/70" />
       </div>
@@ -25,23 +28,25 @@ export function HeroBanner() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/auth/register">
-              <Button
-                size="lg"
-                className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white"
-              >
+            <Button
+              size="lg"
+              className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white"
+              asChild
+            >
+              <Link href="/auth/register">
                 Get Started Now
-              </Button>
-            </Link>
-            <Link href="/about">
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full sm:w-auto border-gray-500 text-gray-300 hover:text-white hover:bg-gray-800"
-              >
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto border-gray-500 text-gray-300 hover:text-white hover:bg-gray-800"
+              asChild
+            >
+              <Link href="/about">
                 Learn More
-              </Button>
-            </Link>
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

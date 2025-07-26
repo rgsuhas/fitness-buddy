@@ -1,4 +1,5 @@
 import { DumbbellIcon as DumbellIcon, LineChart, Users, Sparkles } from "lucide-react"
+import Image from "next/image"
 
 export function FeatureHighlights() {
   const features = [
@@ -50,19 +51,19 @@ export function FeatureHighlights() {
               className={`flex flex-col ${index % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"} gap-6 items-center`}
             >
               <div className="w-full md:w-1/2 rounded-xl overflow-hidden">
-                <img
+                <Image
                   src={feature.image || "/placeholder.svg"}
                   alt={feature.name}
+                  width={500}
+                  height={300}
                   className="w-full h-64 object-cover hover:scale-105 transition-transform duration-500"
                 />
               </div>
               <div className="w-full md:w-1/2 space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-                    <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
-                  </div>
-                  <h3 className="text-xl font-bold">{feature.name}</h3>
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
+                  <feature.icon className="h-6 w-6 text-white" aria-hidden="true" />
                 </div>
+                <h3 className="text-xl font-bold">{feature.name}</h3>
                 <p className="text-gray-400">{feature.description}</p>
               </div>
             </div>
@@ -72,4 +73,5 @@ export function FeatureHighlights() {
     </div>
   )
 }
+
 

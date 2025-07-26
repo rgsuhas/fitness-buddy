@@ -1,11 +1,11 @@
 import express from 'express';
 import { createWorkout, getWorkouts, toggleLike } from '../controllers/workoutController';
-import { auth } from '../middleware/auth';
+import { protect } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
-router.post('/', auth, createWorkout);
+router.post('/', protect, createWorkout);
 router.get('/', getWorkouts);
-router.post('/:id/like', auth, toggleLike);
+router.post('/:id/like', protect, toggleLike);
 
 export default router;

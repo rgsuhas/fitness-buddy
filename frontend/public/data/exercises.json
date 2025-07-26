@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "title": "Barbell Bench Press",
+    "description": "A classic exercise for building chest, shoulder, and tricep strength.",
+    "level": "intermediate",
+    "duration": 60,
+    "category": "Strength",
+    "imageUrl": "/images/workout-1.jpg",
+    "rating": 4.8
+  },
+  {
+    "id": "2",
+    "title": "Dumbbell Bicep Curl",
+    "description": "Isolates the biceps for arm development.",
+    "level": "beginner",
+    "duration": 30,
+    "category": "Strength",
+    "imageUrl": "/images/workout-2.jpg",
+    "rating": 4.5
+  },
+  {
+    "id": "3",
+    "title": "Plank",
+    "description": "Excellent for core strength and stability.",
+    "level": "beginner",
+    "duration": 15,
+    "category": "Core",
+    "imageUrl": "/images/workout-3.jpg",
+    "rating": 4.9
+  },
+  {
+    "id": "4",
+    "title": "Squat",
+    "description": "A fundamental exercise for lower body strength and overall fitness.",
+    "level": "intermediate",
+    "duration": 45,
+    "category": "Strength",
+    "imageUrl": "/images/workout-4.jpg",
+    "rating": 4.7
+  }
+]

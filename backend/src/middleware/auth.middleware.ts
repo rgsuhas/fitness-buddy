@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import User, { IUser } from '../models/User'; // Changed import to use default export
+import { User } from '../models/user.model'; // Changed import to use default export
 import { ApiError } from '../utils/errorHandler';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';

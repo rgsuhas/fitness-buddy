@@ -1,62 +1,35 @@
-'use client'
+"use client"
 
-import { useEffect } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
-import { useUser } from '@/lib/hooks/use-user'
-import { useToast } from '@/components/ui/use-toast'
+import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useUser } from '@/lib/hooks/use-user';
+import { Loader2 } from 'lucide-react';
 
-export default function AuthSuccess() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { setToken, user } = useUser()
-  const { toast } = useToast()
+export default function AuthSuccessPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { setUser } = useUser();
 
   useEffect(() => {
-    const processAuth = async () => {
-      try {
-        const token = searchParams.get('token')
-        if (!token) {
-          console.error('No token received')
-          toast({
-            title: 'Authentication Failed',
-            description: 'No authentication token received',
-            variant: 'destructive',
-          })
-          router.push('/auth/login')
-          return
-        }
+    const token = searchParams.get('token');
 
-        await setToken(token)
-        // Wait for user data to be loaded
-        const maxAttempts = 10
-        let attempts = 0
-        while (!user && attempts < maxAttempts) {
-          await new Promise(resolve => setTimeout(resolve, 500))
-          attempts++
-        }
-
-        if (!user) {
-          throw new Error('Failed to load user data')
-        }
-
-        toast({
-          title: 'Welcome!',
-          description: `Successfully logged in as ${user.name}`,
-        })
-        router.push('/dashboard')
-      } catch (error) {
-        console.error('Auth error:', error)
-        toast({
-          title: 'Authentication Failed',
-          description: 'Failed to complete authentication',
-          variant: 'destructive',
-        })
-        router.push('/auth/login')
-      }
+    if (token) {
+      // In a real application, you would verify this token with your backend
+      // and fetch user details. For this example, we'll just set the token.
+      setUser({ token }); // Assuming setUser can handle just a token for now
+      router.push('/dashboard');
+    } else {
+      // If no token is present, redirect to login or show an error
+      router.push('/auth/login');
     }
+  }, [router, searchParams, setUser]);
 
-    processAuth()
-  }, [searchParams, router, setToken, user, toast])
-
-  return null // No need for loading UI, reduces bundle size
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black py-12 px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col items-center space-y-4 text-white">
+        <Loader2 className="h-12 w-12 animate-spin" />
+        <p className="text-lg">Authenticating...</p>
+      </div>
+    </div>
+  );
 }

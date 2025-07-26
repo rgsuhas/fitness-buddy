@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import passport from 'passport';
 import routes from './routes';
-import authRoutes from './routes/auth.routes';
 import { errorHandler } from './utils/errorHandler';
 import logger from './utils/logger';
 import './config/passport'; // Import passport config
@@ -34,9 +33,6 @@ mongoose.connect(process.env.MONGODB_URI!)
 
 // Routes
 app.use('/api', routes);
-
-// Register the auth routes
-app.use("/api/auth", authRoutes);
 
 // Error handling
 app.use(errorHandler);

@@ -2,8 +2,8 @@ import { Router } from 'express';
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import { register, login, verify } from '../controllers/auth.controller';
-import { validateRegister, validateLogin } from '../middleware/validators';
-import User from '../models/User';
+import { validateRegister, validateLogin } from '../middleware/validators.middleware';
+import { User } from '../models/user.model';
 
 const router = Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secure_jwt_secret';

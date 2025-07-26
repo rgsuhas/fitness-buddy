@@ -1,6 +1,6 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import User, { IUser } from '../models/User';
+import { User } from '../models/user.model';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -40,7 +40,7 @@ passport.use(
           return done(new Error('No email found in Google profile'));
         }
 
-        let user = await User.findOne({ 
+        let user = await User.findOne({
           $or: [
             { email },
             { googleId: profile.id }
@@ -52,7 +52,6 @@ passport.use(
           user.googleId = profile.id;
           user.name = profile.displayName || 'User';
           user.email = email;
-          user.avatar = profile.photos?.[0]?.value || undefined;
           await user.save();
         } else {
           // Create new user
@@ -60,10 +59,8 @@ passport.use(
             googleId: profile.id,
             name: profile.displayName || 'User',
             email,
-            avatar: profile.photos?.[0]?.value,
             role: "user",
             fitnessGoals: [],
-            activityLevel: "beginner"
           });
         }
 

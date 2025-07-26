@@ -1,5 +1,5 @@
 import express from 'express';
-import authRoutes from './authRoutes';
+import authRoutes from './auth.routes';
 import exerciseRoutes from './exerciseRoutes';
 import workoutRoutes from './workoutRoutes';
 import communityRoutes from './communityRoutes';

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import User, { IUser } from '../models/User';
+import { User } from '../models/user.model';
 import { ApiError } from '../utils/errorHandler';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_secure_jwt_secret';
@@ -24,7 +24,6 @@ export const verify = async (req: Request, res: Response, next: NextFunction) =>
       name: user.name,
       email: user.email,
       role: user.role,
-      avatar: user.avatar
     });
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
@@ -73,12 +72,12 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email }) as IUser | null;
+    const user = await User.findOne({ email });
     if (!user) {
       throw new ApiError(401, 'Invalid credentials');
     }
 
-    const isPasswordValid = await user.comparePassword(password);
+    const isPasswordValid = await (user as any).comparePassword(password);
     if (!isPasswordValid) {
       throw new ApiError(401, 'Invalid credentials');
     }

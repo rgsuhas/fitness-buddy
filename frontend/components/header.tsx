@@ -118,14 +118,16 @@ export default function Header() {
                 </div>
               ) : (
                 <div className="flex items-center gap-2">
-                  <Link href="/auth/login">
-                    <Button variant="outline" className="rounded-full">
+                  <Button variant="outline" className="rounded-full" asChild>
+                    <Link href="/auth/login">
                       Log In
-                    </Button>
-                  </Link>
-                  <Link href="/auth/register" className="hidden sm:block">
-                    <Button className="rounded-full">Sign Up</Button>
-                  </Link>
+                    </Link>
+                  </Button>
+                  <Button className="rounded-full" asChild>
+                    <Link href="/auth/register" className="hidden sm:block">
+                      Sign Up
+                    </Link>
+                  </Button>
                 </div>
               )}
             </>

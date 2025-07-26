@@ -1,3 +1,7 @@
+import axios from 'axios';
+
+import axios from 'axios';
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
 
 export interface Post {
@@ -32,127 +36,101 @@ export const communityService = {
   // Posts
   getPosts: async (page = 1, limit = 10): Promise<{ posts: Post[]; total: number; totalPages: number }> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community?page=${page}&limit=${limit}`, {
+    const response = await axios.get(`${API_URL}/api/community?page=${page}&limit=${limit}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!response.ok) throw new Error('Failed to fetch posts');
-    return response.json();
+    return response.data;
   },
 
   getPost: async (id: string): Promise<Post> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community/${id}`, {
+    const response = await axios.get(`${API_URL}/api/community/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!response.ok) throw new Error('Failed to fetch post');
-    return response.json();
+    return response.data;
   },
 
   createPost: async (data: { title: string; content: string; imageUrl?: string; tags?: string[] }): Promise<Post> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community`, {
-      method: 'POST',
+    const response = await axios.post(`${API_URL}/api/community`, data, {
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to create post');
-    return response.json();
+    return response.data;
   },
 
   updatePost: async (id: string, data: { title: string; content: string; imageUrl?: string; tags?: string[] }): Promise<Post> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community/${id}`, {
-      method: 'PUT',
+    const response = await axios.put(`${API_URL}/api/community/${id}`, data, {
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to update post');
-    return response.json();
+    return response.data;
   },
 
   deletePost: async (id: string): Promise<void> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community/${id}`, {
-      method: 'DELETE',
+    await axios.delete(`${API_URL}/api/community/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!response.ok) throw new Error('Failed to delete post');
   },
 
   // Comments
   addComment: async (postId: string, content: string): Promise<Comment> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community/${postId}/comments`, {
-      method: 'POST',
+    const response = await axios.post(`${API_URL}/api/community/${postId}/comments`, { content }, {
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ content }),
     });
-    if (!response.ok) throw new Error('Failed to add comment');
-    return response.json();
+    return response.data;
   },
 
   updateComment: async (postId: string, commentId: string, content: string): Promise<Comment> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community/${postId}/comments/${commentId}`, {
-      method: 'PUT',
+    const response = await axios.put(`${API_URL}/api/community/${postId}/comments/${commentId}`, { content }, {
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ content }),
     });
-    if (!response.ok) throw new Error('Failed to update comment');
-    return response.json();
+    return response.data;
   },
 
   deleteComment: async (postId: string, commentId: string): Promise<void> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community/${postId}/comments/${commentId}`, {
-      method: 'DELETE',
+    await axios.delete(`${API_URL}/api/community/${postId}/comments/${commentId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!response.ok) throw new Error('Failed to delete comment');
   },
 
   // Likes
   togglePostLike: async (postId: string): Promise<{ likes: string[] }> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community/${postId}/like`, {
-      method: 'POST',
+    const response = await axios.post(`${API_URL}/api/community/${postId}/like`, {}, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!response.ok) throw new Error('Failed to toggle like');
-    return response.json();
+    return response.data;
   },
 
   toggleCommentLike: async (postId: string, commentId: string): Promise<{ likes: string[] }> => {
     const token = localStorage.getItem('fitness_buddy_token');
-    const response = await fetch(`${API_URL}/api/community/${postId}/comments/${commentId}/like`, {
-      method: 'POST',
+    const response = await axios.post(`${API_URL}/api/community/${postId}/comments/${commentId}/like`, {}, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    if (!response.ok) throw new Error('Failed to toggle comment like');
-    return response.json();
+    return response.data;
   },
 };

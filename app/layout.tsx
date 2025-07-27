@@ -1,11 +1,10 @@
 import type React from "react"
 import { Inter as FontSans } from "next/font/google"
 import { Toaster } from "sonner"
-import { ThemeProvider } from "@/components/theme-provider"
 import { Sidebar } from "@/components/sidebar"
-import { SessionProvider } from "next-auth/react"
 import Header from "@/components/header"
 import dynamic from 'next/dynamic'
+import { Providers } from "./providers"
 
 import "./globals.css"
 
@@ -27,18 +26,16 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="dark">
       <body className={`font-sans antialiased ${fontSans.variable}`}>
-        <SessionProvider>
-          <ThemeProvider>
-            <div className="min-h-screen flex flex-col">
-              <Header />
-              <div className="flex flex-1">
-                <Sidebar />
-                <main className="flex-1">{children}</main>
-              </div>
+        <Providers>
+          <div className="min-h-screen flex flex-col">
+            <Header />
+            <div className="flex flex-1">
+              <Sidebar />
+              <main className="flex-1">{children}</main>
             </div>
-            <Toaster richColors position="top-right" />
-          </ThemeProvider>
-        </SessionProvider>
+          </div>
+          <Toaster richColors position="top-right" />
+        </Providers>
       </body>
     </html>
   )

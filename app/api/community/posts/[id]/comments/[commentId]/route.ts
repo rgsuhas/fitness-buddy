@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Post from '@/lib/models/Post';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
+import { connectToDB } from '@/lib/db';
 
 // Update comment
 export async function PUT(req: Request, { params }: { params: { id: string, commentId: string } }) {
@@ -26,7 +27,10 @@ export async function PUT(req: Request, { params }: { params: { id: string, comm
       return NextResponse.json({ message: 'Comment not found' }, { status: 404 });
     }
 
-    if (comment.author.toString() !== user._id.toString()) {
+    if (!session.user.id) {
+      return NextResponse.json({ message: 'User ID not found in session' }, { status: 401 });
+    }
+    if (comment.author.toString() !== session.user.id) {
       return NextResponse.json({ message: 'Not authorized' }, { status: 403 });
     }
 
@@ -62,7 +66,10 @@ export async function DELETE(req: Request, { params }: { params: { id: string, c
       return NextResponse.json({ message: 'Comment not found' }, { status: 404 });
     }
 
-    if (comment.author.toString() !== user._id.toString()) {
+    if (!session.user.id) {
+      return NextResponse.json({ message: 'User ID not found in session' }, { status: 401 });
+    }
+    if (comment.author.toString() !== session.user.id) {
       return NextResponse.json({ message: 'Not authorized' }, { status: 403 });
     }
 

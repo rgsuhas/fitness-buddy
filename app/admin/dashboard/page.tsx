@@ -9,8 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Input } from "@/components/ui/input"
 import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
-
-//ChartTooltip, ChartTooltipContent,
+import { ChartTooltipContent } from "@/components/ui/chart-tooltip-content"
 
 import {
   AreaChart,
@@ -230,7 +229,7 @@ export default function AdminDashboardPage() {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <Tooltip content={<ChartTooltipContent />} />
                   <Area
                     type="monotone"
                     dataKey="users"
@@ -307,7 +306,7 @@ export default function AdminDashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis dataKey="day" />
                 <YAxis />
-                <Tooltip content={<CustomTooltip />} />
+                <Tooltip content={<ChartTooltipContent />} />
                 <Legend />
                 <Bar dataKey="workouts" fill="var(--color-workouts)" />
                 <Bar dataKey="plans" fill="var(--color-plans)" />

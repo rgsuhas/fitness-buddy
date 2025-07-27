@@ -28,7 +28,10 @@ export async function POST(req: Request, { params }: { params: { id: string, com
       return NextResponse.json({ message: 'Comment not found' }, { status: 404 });
     }
 
-    const userId = user._id.toString();
+    if (!session.user.id) {
+      return NextResponse.json({ message: 'User ID not found in session' }, { status: 401 });
+    }
+    const userId = session.user.id;
     const index = comment.likes.findIndex((id: Types.ObjectId) => id.toString() === userId);
 
     if (index === -1) {

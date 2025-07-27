@@ -1,15 +1,12 @@
 "use client"
 
-import { useContext } from "react"
-import { AuthContext } from "@/lib/auth-provider"
+import { useSession } from "next-auth/react"
 
 export function useUser() {
-  const context = useContext(AuthContext)
+  const { data: session, status } = useSession();
 
-  if (context === undefined) {
-    throw new Error("useUser must be used within an AuthProvider")
-  }
-
-  return context
+  return {
+    user: session?.user,
+    loading: status === "loading",
+  };
 }
-

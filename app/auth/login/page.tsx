@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useUser } from "@/lib/hooks/use-user"
+import { signIn } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -15,70 +15,73 @@ import { AlertCircle, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function LoginPage() {
-  const { login, loading } = useUser()
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [emailError, setEmailError] = useState("")
-  const [passwordError, setPasswordError] = useState("")
-  const [formError, setFormError] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [formError, setFormError] = useState("");
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/google`
-  }
+  const handleGoogleLogin = async () => {
+    setIsSubmitting(true);
+    await signIn('google', { callbackUrl: '/dashboard' });
+    setIsSubmitting(false);
+  };
 
   const validateForm = () => {
-    let isValid = true
-    setEmailError("")
-    setPasswordError("")
-    setFormError("")
+    let isValid = true;
+    setEmailError("");
+    setPasswordError("");
+    setFormError("");
 
     if (!email) {
-      setEmailError("Email is required")
-      isValid = false
+      setEmailError("Email is required");
+      isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError("Please enter a valid email address")
-      isValid = false
+      setEmailError("Please enter a valid email address");
+      isValid = false;
     }
 
     if (!password) {
-      setPasswordError("Password is required")
-      isValid = false
+      setPasswordError("Password is required");
+      isValid = false;
     }
 
-    return isValid
-  }
+    return isValid;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setIsSubmitting(true)
-    setFormError("")
+    setIsSubmitting(true);
+    setFormError("");
 
     try {
       // Add a small delay to ensure the loading state is visible
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      const success = await login(email, password)
+      // This part needs to be updated to use NextAuth.js credentials provider if you want email/password login
+      // For now, it's commented out as we are focusing on social login
+      // const success = await signIn('credentials', { email, password, redirect: false });
+      // if (success?.error) {
+      //   setFormError(success.error);
+      // } else {
+      //   router.push("/dashboard");
+      // }
+      setFormError("Email/password login is not currently supported. Please use social login.");
 
-      if (success) {
-        router.push("/dashboard")
-      } else {
-        // If login returns false but no error was thrown, show a generic error
-        setFormError("Invalid email or password. Please try again.")
-      }
     } catch (error) {
-      console.error("Login error:", error)
-      setFormError("An unexpected error occurred. Please try again.")
+      console.error("Login error:", error);
+      setFormError("An unexpected error occurred. Please try again.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black py-12 px-4 sm:px-6 lg:px-8">
@@ -142,7 +145,7 @@ export default function LoginPage() {
                 </CardContent>
 
                 <CardFooter className="flex flex-col">
-                  <Button type="submit" className="w-full rounded-full" disabled={isSubmitting || loading}>
+                  <Button type="submit" className="w-full rounded-full" disabled={isSubmitting}>
                     {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     Sign In
                   </Button>

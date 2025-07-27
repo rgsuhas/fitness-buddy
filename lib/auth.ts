@@ -2,6 +2,8 @@ import { NextAuthOptions } from 'next-auth';
 import GoogleProvider from 'next-auth/providers/google';
 import User from '@/lib/models/user.model';
 import { connectToDB } from '@/lib/db';
+import { MongoDBAdapter } from "@auth/mongodb-adapter";
+import clientPromise from "@/lib/db/mongodb";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -61,4 +63,5 @@ export const authOptions: NextAuthOptions = {
     signIn: '/auth/login',
     error: '/auth/error',
   },
+  adapter: MongoDBAdapter(clientPromise),
 };

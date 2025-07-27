@@ -8,21 +8,16 @@ import { Loader2 } from 'lucide-react';
 export default function AuthSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { setUser } = useUser();
+  const { user, loading } = useUser();
 
   useEffect(() => {
-    const token = searchParams.get('token');
-
-    if (token) {
-      // In a real application, you would verify this token with your backend
-      // and fetch user details. For this example, we'll just set the token.
-      setUser({ token }); // Assuming setUser can handle just a token for now
+    if (user) {
       router.push('/dashboard');
-    } else {
-      // If no token is present, redirect to login or show an error
+    } else if (!loading) {
+      // If not loading and no user, redirect to login
       router.push('/auth/login');
     }
-  }, [router, searchParams, setUser]);
+  }, [user, loading, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-900 to-black py-12 px-4 sm:px-6 lg:px-8">

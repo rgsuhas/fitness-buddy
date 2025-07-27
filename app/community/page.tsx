@@ -186,10 +186,8 @@ export default function CommunityPage() {
         setChallenges(mockChallenges)
         setLoading(false)
       } catch (error) {
-        toast({
-          title: "Error",
+        toast.error("Failed to fetch community data", {
           description: "Failed to fetch community data",
-          variant: "destructive"
         })
         setLoading(false)
       }

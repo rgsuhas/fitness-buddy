@@ -118,8 +118,7 @@ export default function ExerciseDetailPage() {
 
   const handleSaveExercise = () => {
     setSaved(!saved)
-    toast({
-      title: saved ? "Exercise removed" : "Exercise saved",
+    toast.info(saved ? "Exercise removed" : "Exercise saved", {
       description: saved ? "Exercise removed from your saved list" : "Exercise added to your saved list",
     })
   }

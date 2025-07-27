@@ -109,8 +109,7 @@ export default function NutritionPage() {
       type: "breakfast",
     })
     setIsAddingMeal(false)
-    toast({
-      title: "Success",
+    toast.success("Success", {
       description: "Meal added successfully",
     })
   }
@@ -120,16 +119,14 @@ export default function NutritionPage() {
 
     setMeals(meals.map((meal) => (meal.id === currentMeal.id ? currentMeal : meal)))
     setCurrentMeal(null)
-    toast({
-      title: "Success",
+    toast.success("Success", {
       description: "Meal updated successfully",
     })
   }
 
   const handleDeleteMeal = (id: string) => {
     setMeals(meals.filter((meal) => meal.id !== id))
-    toast({
-      title: "Success",
+    toast.success("Success", {
       description: "Meal deleted successfully",
     })
   }

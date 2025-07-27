@@ -5,7 +5,8 @@ import { useState, useEffect } from "react"
 import { Menu, X, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { useUser } from "@/lib/hooks/use-user"
+import { signOut } from "next-auth/react";
+import { useUser } from "@/lib/hooks/use-user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -21,7 +22,7 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
 
-  const { user, loading, logout } = useUser()
+  const { user, loading } = useUser()
 
   // Add scroll effect
   useEffect(() => {
@@ -83,7 +84,7 @@ export default function Header() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" size="icon" className="relative rounded-full">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={user?.image} alt={user?.name ?? 'User avatar'} />
+                          <AvatarImage src={user?.image || ''} alt={user?.name ?? 'User avatar'} />
                           <AvatarFallback>{user?.name?.[0] ?? '?'}</AvatarFallback>
                         </Avatar>
                         <span className="sr-only">Open user menu</span>
@@ -107,7 +108,7 @@ export default function Header() {
                       <DropdownMenuItem
                         onSelect={(event) => {
                           event.preventDefault();
-                          logout();
+                          signOut();
                         }}
                         className="text-destructive focus:text-destructive cursor-pointer"
                       >

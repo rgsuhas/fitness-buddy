@@ -52,8 +52,8 @@ const challengeFormSchema = z
     endDate: z.date({
       required_error: "End date is required.",
     }),
-    isPrivate: z.boolean().default(false),
-    inviteFriends: z.boolean().default(false),
+    isPrivate: z.boolean(),
+    inviteFriends: z.boolean(),
   })
   .refine((data) => data.endDate > data.startDate, {
     message: "End date must be after start date.",
@@ -68,7 +68,7 @@ export default function CreateChallengePage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Default form values
-  const defaultValues: Partial<ChallengeFormValues> = {
+  const defaultValues: ChallengeFormValues = {
     title: "",
     description: "",
     category: "",

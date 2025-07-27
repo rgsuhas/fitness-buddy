@@ -15,7 +15,7 @@ import { AlertCircle, Loader2 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
 export default function RegisterPage() {
-  const { register, loading } = useUser()
+  const { user, loading: userLoading } = useUser()
   const router = useRouter()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
@@ -85,10 +85,20 @@ export default function RegisterPage() {
     setIsSubmitting(true)
 
     try {
-      const success = await register(name, email, password)
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email, password }),
+      });
 
-      if (success) {
-        router.push("/onboarding")
+      const data = await response.json();
+
+      if (response.ok) {
+        router.push("/onboarding");
+      } else {
+        setFormError(data.message || "Registration failed.");
       }
     } catch (error) {
       console.error("Registration error:", error)
@@ -191,7 +201,7 @@ export default function RegisterPage() {
             </CardContent>
 
             <CardFooter className="flex flex-col">
-              <Button type="submit" className="w-full" disabled={isSubmitting || loading}>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Create Account
               </Button>

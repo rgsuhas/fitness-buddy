@@ -53,12 +53,16 @@ export async function POST(req: Request) {
     }
 
     const { title, content, imageUrl, tags } = await req.json();
+    if (!session.user.id) {
+      return NextResponse.json({ message: 'User ID not found in session' }, { status: 401 });
+    }
+    const userId = session.user.id;
     const post = await Post.create({
       title,
       content,
       imageUrl,
       tags,
-      author: user._id
+      author: userId
     });
 
     const populatedPost = await post.populate('author', 'name avatar');

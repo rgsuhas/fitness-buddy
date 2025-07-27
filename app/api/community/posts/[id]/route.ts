@@ -46,7 +46,10 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
 
-    if (post.author.toString() !== user._id.toString()) {
+    if (!session.user.id) {
+      return NextResponse.json({ message: 'User ID not found in session' }, { status: 401 });
+    }
+    if (post.author.toString() !== session.user.id) {
       return NextResponse.json({ message: 'Not authorized' }, { status: 403 });
     }
 
@@ -81,7 +84,10 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
       return NextResponse.json({ message: 'Post not found' }, { status: 404 });
     }
 
-    if (post.author.toString() !== user._id.toString()) {
+    if (!session.user.id) {
+      return NextResponse.json({ message: 'User ID not found in session' }, { status: 401 });
+    }
+    if (post.author.toString() !== session.user.id) {
       return NextResponse.json({ message: 'Not authorized' }, { status: 403 });
     }
 

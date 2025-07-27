@@ -17,7 +17,10 @@ export async function GET(req: Request) {
       return NextResponse.json({ message: 'Authentication required' }, { status: 401 });
     }
 
-    const userId = user._id;
+    if (!session.user.id) {
+      return NextResponse.json({ message: 'User ID not found in session' }, { status: 401 });
+    }
+    const userId = session.user.id;
 
     // Get all messages where the user is either the sender or receiver
     const messages = await Message.find({

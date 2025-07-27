@@ -17,6 +17,7 @@
 frontend/.next/
 frontend/out/
 frontend/build/
+.next/
 
 # backend
 backend/__pycache__/
@@ -30,6 +31,10 @@ backend/.pytest_cache/
 *.pem
 **/.env*
 !.env.example
+.env.local
+
+# next-auth
+/types/next-auth.d.ts
 
 # debug
 npm-debug.log*

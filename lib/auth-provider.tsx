@@ -4,17 +4,26 @@ import { createContext, type ReactNode } from "react"
 import { SessionProvider, useSession, signOut } from "next-auth/react"
 import { toast } from "sonner"
 import { useRouter, usePathname } from "next/navigation"
-import { DefaultSession } from "next-auth"
 
-interface User extends DefaultSession["user"] {
-  id?: string
-  role?: "user" | "admin"
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id?: string;
+      role?: "user" | "admin";
+    } & DefaultSession["user"];
+  }
+
+  interface User {
+    id?: string;
+    role?: "user" | "admin";
+  }
 }
 
 interface AuthContextType {
-  user: User | null
-  loading: boolean
-  logout: () => void
+  user: Session["user"] | null;
+  loading: boolean;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -29,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 function AuthContent({ children }: { children: ReactNode }) {
   const { data: session, status } = useSession()
-  const user: User | null = session?.user ? {
+  const user: Session["user"] | null = session?.user ? {
     id: session.user.id as string,
     name: session.user.name as string,
     email: session.user.email as string,
@@ -58,17 +67,17 @@ function AuthContent({ children }: { children: ReactNode }) {
   //     // If route is protected and user is not logged in
   //     if (protectedRoutes.some((route) => pathname?.startsWith(route)) && !user) {
   //       router.push("/auth/login")
-  toast.error("Authentication required", {
-          description: "Please log in to access this page.",
-        })
+  //       toast.error("Authentication required", {
+  //         description: "Please log in to access this page.",
+  //       })
   //     }
 
   //     // If route is admin-only and user is not admin
   //     if (adminRoutes.some((route) => pathname?.startsWith(route)) && (!user || user.role !== "admin")) {
   //       router.push("/")
-  toast.error("Access denied", {
-          description: "You don't have permission to access this page.",
-        })
+  //       toast.error("Access denied", {
+  //         description: "You don't have permission to access this page.",
+  //       })
   //     }
   //   }
   // }, [loading, user, pathname, router, toast])

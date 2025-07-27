@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { ArrowLeft, Calendar, Download, Edit, Printer, Save, Share2, Sparkles } from "lucide-react"
 import { handleApiError } from "@/lib/error-handler"
 
@@ -32,7 +32,7 @@ interface WorkoutPlan {
 
 export default function AIGeneratedPlanPage() {
   const router = useRouter()
-  const { toast } = useToast()
+  
   const [loading, setLoading] = useState(true)
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null)
   const [activeDay, setActiveDay] = useState("day1")
@@ -250,10 +250,9 @@ export default function AIGeneratedPlanPage() {
   }, [toast])
 
   const handleSaveWorkout = () => {
-    toast({
-      title: "Workout Plan Saved",
-      description: "Your workout plan has been saved to your account.",
-    })
+    toast.success("Workout plan saved", {
+        description: "Your AI-generated workout plan has been saved to your workouts.",
+      })
   }
 
   const handlePrintWorkout = () => {
@@ -261,15 +260,13 @@ export default function AIGeneratedPlanPage() {
   }
 
   const handleDownloadWorkout = () => {
-    toast({
-      title: "Workout Plan Downloaded",
+    toast.info("Workout Plan Downloaded", {
       description: "Your workout plan has been downloaded as a PDF.",
     })
   }
 
   const handleShareWorkout = () => {
-    toast({
-      title: "Share Link Created",
+    toast.info("Share Link Created", {
       description: "A shareable link has been copied to your clipboard.",
     })
   }

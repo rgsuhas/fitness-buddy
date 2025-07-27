@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Switch } from "@/components/ui/switch"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { cn } from "@/lib/utils"
 
 const challengeFormSchema = z
@@ -64,7 +64,7 @@ type ChallengeFormValues = z.infer<typeof challengeFormSchema>
 
 export default function CreateChallengePage() {
   const router = useRouter()
-  const { toast } = useToast()
+  
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Default form values
@@ -94,18 +94,15 @@ export default function CreateChallengePage() {
 
       console.log("Challenge data:", data)
 
-      toast({
-        title: "Challenge created!",
-        description: "Your challenge has been created successfully.",
+      toast.success("Challenge created", {
+        description: "Your new challenge has been successfully created.",
       })
 
       router.push("/community?tab=challenges")
     } catch (error) {
       console.error("Failed to create challenge:", error)
-      toast({
-        title: "Failed to create challenge",
-        description: "There was an error creating your challenge. Please try again.",
-        variant: "destructive",
+      toast.error("Error creating challenge", {
+        description: "Failed to create challenge. Please try again.",
       })
     } finally {
       setIsSubmitting(false)

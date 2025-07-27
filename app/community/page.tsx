@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Heart, MessageSquare, Share2, ChevronUp, UserPlus, Trophy, Target, Search, Filter, Plus, Image, Send } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { useUser } from "@/lib/hooks/use-user"
 import { communityService, type Post } from "@/lib/services/community"
 import { PlaceholderImage } from "@/components/ui/placeholder-image"
@@ -47,7 +47,7 @@ interface PostWithMeta extends Post {
 
 export default function CommunityPage() {
   const { user } = useUser()
-  const { toast } = useToast()
+  
   const router = useRouter()
   const searchParams = useSearchParams()
   const tabParam = searchParams.get("tab")
@@ -106,10 +106,8 @@ export default function CommunityPage() {
         setLoading(false)
       } catch (error) {
         console.error('Failed to fetch posts:', error)
-        toast({
-          title: "Error",
-          description: "Failed to fetch posts",
-          variant: "destructive"
+        toast.error("Error loading posts", {
+          description: "Failed to load community posts. Please try again later.",
         })
         setLoading(false)
       }
@@ -207,10 +205,8 @@ export default function CommunityPage() {
     // Validate file type
     const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
     if (!validTypes.includes(file.type)) {
-      toast({
-        title: "Invalid file type",
+      toast.error("Invalid file type", {
         description: "Only JPEG, PNG, GIF, and WebP images are allowed",
-        variant: "destructive"
       })
       return
     }
@@ -218,10 +214,8 @@ export default function CommunityPage() {
     // Validate file size (max 5MB)
     const maxSize = 5 * 1024 * 1024 // 5MB
     if (file.size > maxSize) {
-      toast({
-        title: "File too large",
+      toast.error("File too large", {
         description: "Image size must be less than 5MB",
-        variant: "destructive"
       })
       return
     }
@@ -238,19 +232,15 @@ export default function CommunityPage() {
 
   const handleCreatePost = async () => {
     if (!user) {
-      toast({
-        title: "Authentication required",
+      toast.error("Authentication required", {
         description: "Please log in to create a post",
-        variant: "destructive"
       })
       return
     }
 
     if (!newPost.title.trim() || !newPost.content.trim()) {
-      toast({
-        title: "Missing information",
+      toast.error("Missing information", {
         description: "Please provide both a title and content for your post",
-        variant: "destructive"
       })
       return
     }
@@ -313,16 +303,13 @@ export default function CommunityPage() {
       setImagePreview(null)
       setIsCreatingPost(false)
       
-      toast({
-        title: "Success",
-        description: "Your post has been published",
+      toast.success("Post created", {
+        description: "Your post has been successfully published.",
       })
     } catch (error) {
       console.error('Failed to create post:', error)
-      toast({
-        title: "Error",
-        description: "Failed to create post. Please try again.",
-        variant: "destructive"
+      toast.error("Error creating post", {
+        description: "Failed to publish your post. Please try again.",
       })
     } finally {
       setIsSubmitting(false)
@@ -331,10 +318,8 @@ export default function CommunityPage() {
 
   const handleLikePost = async (postId: string) => {
     if (!user) {
-      toast({
-        title: "Authentication required",
+      toast.error("Authentication required", {
         description: "Please log in to like posts",
-        variant: "destructive"
       })
       return
     }
@@ -367,10 +352,8 @@ export default function CommunityPage() {
       }))
     } catch (error) {
       console.error('Failed to like post:', error)
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to like post",
-        variant: "destructive"
       })
     }
   }
@@ -385,15 +368,12 @@ export default function CommunityPage() {
           return buddy
         })
       )
-      toast({
-        title: "Success",
+      toast.success("Success", {
         description: "Buddy follow status updated",
       })
     } catch (error) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update buddy status",
-        variant: "destructive"
       })
     }
   }
@@ -408,15 +388,12 @@ export default function CommunityPage() {
           return challenge
         })
       )
-      toast({
-        title: "Success",
+      toast.success("Success", {
         description: "Challenge join status updated",
       })
     } catch (error) {
-      toast({
-        title: "Error",
+      toast.error("Error", {
         description: "Failed to update challenge status",
-        variant: "destructive"
       })
     }
   }

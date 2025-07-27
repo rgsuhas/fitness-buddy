@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { SearchIcon, Filter, ChevronRight } from "lucide-react"
 import { PlaceholderImage } from "@/components/ui/placeholder-image"
 
@@ -38,7 +38,7 @@ const equipmentOptions = [
 ]
 
 export default function ExercisesPage() {
-  const { toast } = useToast()
+  
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("All")
   const [selectedEquipment, setSelectedEquipment] = useState("All")
@@ -156,10 +156,8 @@ export default function ExercisesPage() {
         setLoading(false)
       } catch (error) {
         console.error("Failed to fetch exercises:", error)
-        toast({
-          title: "Error loading exercises",
+        toast.error("Error loading exercises", {
           description: "Please try again later.",
-          variant: "destructive",
         })
         setLoading(false)
       }

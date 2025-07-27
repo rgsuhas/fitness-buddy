@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ChevronRight, Trophy, Users, Calendar } from 'lucide-react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
-import { useToast } from '@/components/ui/use-toast'
+import { toast } from "sonner"
 
 interface Challenge {
   id: string
@@ -78,7 +78,7 @@ export default function ChallengesPage() {
   const [enrolledChallenges, setEnrolledChallenges] = useState<string[]>([])
   const [selectedChallenge, setSelectedChallenge] = useState<Challenge | null>(null)
   const [challenges, setChallenges] = useState(mockChallenges)
-  const { toast } = useToast()
+  
 
   const filteredChallenges = challenges.filter(challenge => {
     if (activeTab === 'all') return true
@@ -87,8 +87,7 @@ export default function ChallengesPage() {
 
   const handleEnroll = (challenge: Challenge) => {
     if (enrolledChallenges.includes(challenge.id)) {
-      toast({
-        title: "Already Enrolled",
+      toast.info("Already Enrolled", {
         description: "You are already participating in this challenge",
       })
       return
@@ -102,8 +101,7 @@ export default function ChallengesPage() {
       progress: 0,
     }
     setChallenges(challenges.map(c => c.id === challenge.id ? updatedChallenge : c))
-    toast({
-      title: "Successfully Enrolled",
+    toast.success("Successfully Enrolled", {
       description: `You've joined the ${challenge.title} challenge!`,
     })
   }

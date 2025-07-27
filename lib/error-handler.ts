@@ -1,12 +1,7 @@
 import React from "react"
 import { toast } from "sonner"
 
-type ToastFunction = (props: {
-  title?: string
-  description?: string
-  action?: ToastActionElement
-  variant?: "default" | "destructive"
-}) => void
+type ToastFunction = typeof toast
 
 export const handleApiError = (
   error: unknown,
@@ -38,10 +33,8 @@ export const handleApiError = (
     }
   }
 
-  toast({
-    title,
+  toast.error(title, {
     description,
-    variant: "destructive",
   })
 
   if (options?.onError) {
@@ -82,10 +75,8 @@ export const handleFormError = (
     }
   }
 
-  toast({
-    title,
+  toast.error(title, {
     description,
-    variant: "destructive",
   })
 
   if (setFormError) {

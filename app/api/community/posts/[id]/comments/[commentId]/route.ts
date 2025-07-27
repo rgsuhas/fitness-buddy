@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Post } from '@/lib/models/Post';
+import Post from '@/lib/models/Post';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 // Update comment
 export async function PUT(req: Request, { params }: { params: { id: string, commentId: string } }) {

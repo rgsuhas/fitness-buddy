@@ -70,6 +70,11 @@ export function Sidebar() {
       icon: Sparkles,
     },
     {
+      title: "AI Workout Plans",
+      href: "/workout-plans/ai-generator",
+      icon: Sparkles,
+    },
+    {
       title: "Progress",
       href: "/progress",
       icon: LineChart,

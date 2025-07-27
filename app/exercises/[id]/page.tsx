@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { ArrowLeft, Play, Bookmark, Share2, ThumbsUp } from "lucide-react"
 
 interface Exercise {
@@ -30,7 +30,7 @@ interface Exercise {
 export default function ExerciseDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const { toast } = useToast()
+  
   const [exercise, setExercise] = useState<Exercise | null>(null)
   const [loading, setLoading] = useState(true)
   const [saved, setSaved] = useState(false)
@@ -104,11 +104,9 @@ export default function ExerciseDetailPage() {
         setLoading(false)
       } catch (error) {
         console.error("Failed to fetch exercise details:", error)
-        toast({
-          title: "Error loading exercise",
-          description: "Please try again later.",
-          variant: "destructive",
-        })
+        toast.error("Failed to add exercise", {
+        description: "There was an error adding the exercise. Please try again.",
+      })
         setLoading(false)
       }
     }
@@ -127,10 +125,9 @@ export default function ExerciseDetailPage() {
   }
 
   const handleAddToWorkout = () => {
-    toast({
-      title: "Added to workout",
-      description: "Exercise has been added to your current workout",
-    })
+    toast.success("Exercise added", {
+        description: "This exercise has been added to your workout plan.",
+      })
   }
 
   if (loading) {

@@ -6,7 +6,7 @@
     "level": "intermediate",
     "duration": 60,
     "category": "Strength",
-    "imageUrl": "/images/workout-1.jpg",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
     "rating": 4.8
   },
   {
@@ -16,7 +16,7 @@
     "level": "beginner",
     "duration": 30,
     "category": "Strength",
-    "imageUrl": "/images/workout-2.jpg",
+    "imageUrl": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
     "rating": 4.5
   },
   {
@@ -26,7 +26,7 @@
     "level": "beginner",
     "duration": 15,
     "category": "Core",
-    "imageUrl": "/images/workout-3.jpg",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
     "rating": 4.9
   },
   {
@@ -36,7 +36,127 @@
     "level": "intermediate",
     "duration": 45,
     "category": "Strength",
-    "imageUrl": "/images/workout-4.jpg",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
     "rating": 4.7
+  },
+  {
+    "id": "5",
+    "title": "Deadlift",
+    "description": "A compound exercise that targets multiple muscle groups including back, legs, and core.",
+    "level": "advanced",
+    "duration": 60,
+    "category": "Strength",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.6
+  },
+  {
+    "id": "6",
+    "title": "Pull-ups",
+    "description": "Upper body strength exercise targeting back and biceps.",
+    "level": "intermediate",
+    "duration": 30,
+    "category": "Strength",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.4
+  },
+  {
+    "id": "7",
+    "title": "Push-ups",
+    "description": "Classic bodyweight exercise for chest, shoulders, and triceps.",
+    "level": "beginner",
+    "duration": 20,
+    "category": "Strength",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.8
+  },
+  {
+    "id": "8",
+    "title": "Lunges",
+    "description": "Lower body exercise that improves balance and leg strength.",
+    "level": "beginner",
+    "duration": 25,
+    "category": "Strength",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.3
+  },
+  {
+    "id": "9",
+    "title": "Overhead Press",
+    "description": "Shoulder press exercise for building upper body strength.",
+    "level": "intermediate",
+    "duration": 40,
+    "category": "Strength",
+    "imageUrl": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.5
+  },
+  {
+    "id": "10",
+    "title": "Romanian Deadlift",
+    "description": "Hip hinge exercise targeting hamstrings and glutes.",
+    "level": "intermediate",
+    "duration": 50,
+    "category": "Strength",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.4
+  },
+  {
+    "id": "11",
+    "title": "Dumbbell Row",
+    "description": "Back exercise for building lat strength and posture.",
+    "level": "beginner",
+    "duration": 35,
+    "category": "Strength",
+    "imageUrl": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.6
+  },
+  {
+    "id": "12",
+    "title": "Leg Press",
+    "description": "Machine-based leg exercise for quad and glute development.",
+    "level": "beginner",
+    "duration": 45,
+    "category": "Strength",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.2
+  },
+  {
+    "id": "13",
+    "title": "Burpees",
+    "description": "Full-body cardio exercise that combines strength and conditioning.",
+    "level": "intermediate",
+    "duration": 20,
+    "category": "Cardio",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.1
+  },
+  {
+    "id": "14",
+    "title": "Mountain Climbers",
+    "description": "Dynamic core exercise that also provides cardio benefits.",
+    "level": "beginner",
+    "duration": 15,
+    "category": "Cardio",
+    "imageUrl": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.3
+  },
+  {
+    "id": "15",
+    "title": "Jumping Jacks",
+    "description": "Classic cardio exercise for warming up and conditioning.",
+    "level": "beginner",
+    "duration": 10,
+    "category": "Cardio",
+    "imageUrl": "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.0
+  },
+  {
+    "id": "16",
+    "title": "High Knees",
+    "description": "High-intensity cardio exercise that targets core and legs.",
+    "level": "beginner",
+    "duration": 15,
+    "category": "Cardio",
+    "imageUrl": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
+    "rating": 4.2
   }
-]
+] 

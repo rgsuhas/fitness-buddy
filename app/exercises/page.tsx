@@ -38,7 +38,6 @@ const equipmentOptions = [
 ]
 
 export default function ExercisesPage() {
-  
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("All")
   const [selectedEquipment, setSelectedEquipment] = useState("All")
@@ -48,117 +47,31 @@ export default function ExercisesPage() {
   const [exercises, setExercises] = useState<Exercise[]>([])
 
   useEffect(() => {
-    // Simulate API call to fetch exercises
+    // Fetch exercises from JSON file
     const fetchExercises = async () => {
       try {
         // Simulating network delay
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        await new Promise((resolve) => setTimeout(resolve, 1000))
 
-        // Mock data
-        setExercises([
-          {
-            id: "ex1",
-            name: "Barbell Bench Press",
-            muscleGroup: "Chest",
-            equipment: "Barbell",
-            difficulty: "intermediate",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex2",
-            name: "Pull-ups",
-            muscleGroup: "Back",
-            equipment: "Bodyweight",
-            difficulty: "intermediate",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex3",
-            name: "Squat",
-            muscleGroup: "Legs",
-            equipment: "Barbell",
-            difficulty: "intermediate",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex4",
-            name: "Shoulder Press",
-            muscleGroup: "Shoulders",
-            equipment: "Dumbbells",
-            difficulty: "intermediate",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex5",
-            name: "Bicep Curl",
-            muscleGroup: "Arms",
-            equipment: "Dumbbells",
-            difficulty: "beginner",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex6",
-            name: "Plank",
-            muscleGroup: "Abs",
-            equipment: "Bodyweight",
-            difficulty: "beginner",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex7",
-            name: "Deadlift",
-            muscleGroup: "Back",
-            equipment: "Barbell",
-            difficulty: "advanced",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex8",
-            name: "Push-ups",
-            muscleGroup: "Chest",
-            equipment: "Bodyweight",
-            difficulty: "beginner",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex9",
-            name: "Leg Press",
-            muscleGroup: "Legs",
-            equipment: "Machine",
-            difficulty: "beginner",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex10",
-            name: "Tricep Dips",
-            muscleGroup: "Arms",
-            equipment: "Bodyweight",
-            difficulty: "intermediate",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex11",
-            name: "Crunches",
-            muscleGroup: "Abs",
-            equipment: "Bodyweight",
-            difficulty: "beginner",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-          {
-            id: "ex12",
-            name: "Lateral Raise",
-            muscleGroup: "Shoulders",
-            equipment: "Dumbbells",
-            difficulty: "beginner",
-            imageUrl: "/placeholder.svg?height=200&width=300",
-          },
-        ])
+        // Fetch from the JSON file
+        const response = await fetch('/data/exercises.json')
+        const data = await response.json()
+        
+        // Transform the data to match our interface
+        const transformedExercises = data.map((exercise: any) => ({
+          id: exercise.id,
+          name: exercise.title,
+          muscleGroup: exercise.category === "Core" ? "Abs" : exercise.category,
+          equipment: exercise.category === "Strength" ? "Dumbbells" : "Bodyweight",
+          difficulty: exercise.level,
+          imageUrl: exercise.imageUrl,
+        }))
+        
+        setExercises(transformedExercises)
         setLoading(false)
       } catch (error) {
         console.error("Failed to fetch exercises:", error)
-        toast.error("Error loading exercises", {
-          description: "Please try again later.",
-        })
+        toast.error("Failed to load exercises")
         setLoading(false)
       }
     }
@@ -271,9 +184,8 @@ export default function ExercisesPage() {
       </Tabs>
     </div>
   )
-}
 
-function renderExercises(exercises: Exercise[], loading: boolean) {
+  function renderExercises(exercises: Exercise[], loading: boolean) {
   if (loading) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -281,8 +193,11 @@ function renderExercises(exercises: Exercise[], loading: boolean) {
           <Card key={index} className="overflow-hidden">
             <Skeleton className="h-[200px] w-full" />
             <CardContent className="p-4">
-              <Skeleton className="h-5 w-3/4 mb-2" />
-              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-6 w-3/4 mb-2" />
+              <div className="flex gap-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-20" />
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -293,8 +208,23 @@ function renderExercises(exercises: Exercise[], loading: boolean) {
   if (exercises.length === 0) {
     return (
       <div className="text-center py-12">
-        <h3 className="text-lg font-medium">No exercises found</h3>
-        <p className="text-muted-foreground mt-1">Try adjusting your filters or search query</p>
+        <div className="text-muted-foreground mb-4">
+          <SearchIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+          <h3 className="text-lg font-medium mb-2">No exercises found</h3>
+          <p className="text-sm">Try adjusting your search or filter criteria</p>
+        </div>
+        <Button
+          variant="outline"
+          onClick={() => {
+            setSearchQuery("")
+            setSelectedMuscleGroup("All")
+            setSelectedEquipment("All")
+            setSelectedDifficulty("All")
+            setActiveTab("all")
+          }}
+        >
+          Clear Filters
+        </Button>
       </div>
     )
   }
@@ -344,5 +274,6 @@ function renderExercises(exercises: Exercise[], loading: boolean) {
       ))}
     </div>
   )
+}
 }
 

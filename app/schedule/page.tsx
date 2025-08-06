@@ -7,11 +7,9 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
-import { Plus, Edit2, Trash2 } from "lucide-react"
+import { Plus, Edit2, Trash2, Calendar as CalendarIcon } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
-import { buttonVariants } from "@/components/ui/button"
 
 interface WorkoutSession {
   id: string
@@ -123,36 +121,28 @@ export default function SchedulePage() {
 
   return (
     <div className="container py-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="md:col-span-1">
-          <CardHeader>
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight mb-2">Schedule</h1>
+        <p className="text-muted-foreground">Plan and manage your workout sessions</p>
+      </div>
+      
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        <Card className="xl:col-span-1">
+          <CardHeader className="pb-4">
             <CardTitle>Calendar</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <Calendar
               mode="single"
               selected={selectedDate}
               onSelect={(date: Date | undefined) => date && setSelectedDate(date)}
-              className="rounded-md border shadow"
-              defaultMonth={new Date(2025, 3)} // April 2025 (months are 0-indexed)
-              fromYear={2025}
+              className="rounded-md border shadow-sm"
+              defaultMonth={new Date()}
+              fromYear={2024}
               toYear={2026}
               captionLayout="dropdown"
               showOutsideDays={true}
               fixedWeeks={true}
-              ISOWeek={false}
-              classNames={{
-                caption: "flex justify-center pt-1 relative items-center text-lg font-bold",
-                month: "space-y-4",
-                table: "w-full border-collapse space-y-1",
-                head_row: "flex",
-                head_cell: "text-muted-foreground rounded-md w-10 font-normal text-[0.8rem] flex-1 text-center",
-                row: "flex w-full mt-2",
-                cell: "h-10 w-10 text-center text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: cn(buttonVariants({ variant: "ghost" }), "h-10 w-10 p-0 font-normal aria-selected:opacity-100"),
-                day_selected: "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-                day_today: "bg-accent text-accent-foreground",
-              }}
             />
             <div className="mt-4">
               <Dialog open={isAddingSession} onOpenChange={setIsAddingSession}>
@@ -218,7 +208,7 @@ export default function SchedulePage() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2">
+        <Card className="xl:col-span-3">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>
               Workouts for {format(selectedDate, "MMMM d, yyyy")}
@@ -227,18 +217,22 @@ export default function SchedulePage() {
           <CardContent>
             <div className="space-y-4">
               {getSessionsByDate(selectedDate).length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">
-                  No workouts scheduled for this day
-                </p>
+                <div className="text-center py-12">
+                  <div className="text-muted-foreground">
+                    <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-lg font-medium mb-2">No workouts scheduled</h3>
+                    <p className="text-sm">Click "Add Workout" to schedule a session for this day</p>
+                  </div>
+                </div>
               ) : (
                 getSessionsByDate(selectedDate).map((session) => (
                   <div
                     key={session.id}
-                    className="flex items-center justify-between p-4 rounded-lg border"
+                    className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
                   >
-                    <div className="space-y-1">
+                    <div className="flex-1 space-y-1">
                       <div className="flex items-center space-x-2">
-                        <span className="font-medium">{session.workout}</span>
+                        <span className="font-medium text-base">{session.workout}</span>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(
                             session.type

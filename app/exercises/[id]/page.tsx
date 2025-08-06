@@ -80,22 +80,22 @@ export default function ExerciseDetailPage() {
             "Complete the recommended number of repetitions while maintaining proper form",
           ],
           videoUrl: "https://example.com/video.mp4",
-          imageUrl: "/images/workout-" + ((Number.parseInt(params.id as string, 10) % 4) + 1) + ".jpg",
+          imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
           relatedExercises: [
             {
               id: "ex4",
               name: "Shoulder Press",
-              imageUrl: "/images/workout-1.jpg",
+              imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
             },
             {
               id: "ex5",
               name: "Bicep Curl",
-              imageUrl: "/images/workout-2.jpg",
+              imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
             },
             {
               id: "ex6",
               name: "Plank",
-              imageUrl: "/images/workout-3.jpg",
+              imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
             },
           ],
         }

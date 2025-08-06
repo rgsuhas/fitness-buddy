@@ -65,6 +65,11 @@ export function Sidebar() {
       icon: DumbellIcon,
     },
     {
+      title: "Workouts",
+      href: "/workouts",
+      icon: DumbellIcon,
+    },
+    {
       title: "AI Workout Plans",
       href: "/workout-plans/ai-generator",
       icon: Sparkles,

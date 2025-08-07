@@ -1,47 +1,49 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+import { useParams, useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ArrowLeft, Calendar, Clock, Target, Users, Zap } from "lucide-react"
 import { toast } from "sonner"
-import { ArrowLeft, Calendar, Download, Edit, Printer, Save, Share2, Sparkles } from "lucide-react"
-import { handleApiError } from "@/lib/error-handler"
 
 interface WorkoutPlan {
   id: string
   title: string
   description: string
-  level: "beginner" | "intermediate" | "advanced"
+  level: string
   duration: string
   goal: string
-  schedule: {
-    day: string
-    title: string
-    description: string
-    warmup: string[]
-    exercises: { name: string; reps: number; sets: number }[]
-    cooldown: string[]
-  }[]
-  notes: string
-  aiGenerated: boolean
+  workouts: {
+    [key: string]: {
+      day: string
+      focus: string
+      exercises: Array<{
+        name: string
+        sets: number
+        reps: string
+        rest: string
+        notes?: string
+      }>
+    }
+  }
 }
 
 export default function AIGeneratedPlanPage() {
   const router = useRouter()
   
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Changed to false for immediate loading
   const [workoutPlan, setWorkoutPlan] = useState<WorkoutPlan | null>(null)
   const [activeDay, setActiveDay] = useState("day1")
 
   useEffect(() => {
     const fetchWorkoutPlan = async () => {
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500))
+        setLoading(true)
+        // Remove artificial delay - load immediately
 
         // Mock data
         const mockWorkoutPlan: WorkoutPlan = {
@@ -52,195 +54,93 @@ export default function AIGeneratedPlanPage() {
           level: "intermediate",
           duration: "8 weeks",
           goal: "Build Muscle & Strength",
-          schedule: [
-            {
-              day: "day1",
-              title: "Day 1: Upper Body Push",
-              description: "Focus on chest, shoulders, and triceps with compound movements and isolation exercises.",
-              warmup: [
-                "5 minutes of light cardio (jogging, jumping jacks, etc.)",
-                "Arm circles and shoulder rotations",
-                "Push-up progression (5-10 reps)",
-              ],
+          workouts: {
+            day1: {
+              day: "Day 1 - Push",
+              focus: "Chest, Shoulders, Triceps",
               exercises: [
-                {
-                  name: "Barbell Bench Press",
-                  sets: 4,
-                  reps: 6,
-                },
-                {
-                  name: "Seated Dumbbell Shoulder Press",
-                  sets: 3,
-                  reps: 8,
-                },
-                {
-                  name: "Incline Dumbbell Press",
-                  sets: 3,
-                  reps: 8,
-                },
-                {
-                  name: "Cable Tricep Pushdown",
-                  sets: 3,
-                  reps: 10,
-                },
-                {
-                  name: "Lateral Raises",
-                  sets: 3,
-                  reps: 12,
-                },
-              ],
-              cooldown: [
-                "Chest stretch (30 seconds per side)",
-                "Tricep stretch (30 seconds per arm)",
-                "Shoulder stretch (30 seconds per side)",
+                { name: "Barbell Bench Press", sets: 4, reps: "8-10", rest: "2-3 min" },
+                { name: "Incline Dumbbell Press", sets: 3, reps: "10-12", rest: "2 min" },
+                { name: "Military Press", sets: 3, reps: "8-10", rest: "2 min" },
+                { name: "Dips", sets: 3, reps: "8-12", rest: "1.5 min" },
+                { name: "Lateral Raises", sets: 3, reps: "12-15", rest: "1 min" },
+                { name: "Tricep Extensions", sets: 3, reps: "12-15", rest: "1 min" },
               ],
             },
-            {
-              day: "day2",
-              title: "Day 2: Lower Body",
-              description: "Focus on quadriceps, hamstrings, glutes and calves with compound movements.",
-              warmup: [
-                "5 minutes of light cardio (stationary bike, elliptical, etc.)",
-                "Bodyweight squats (10-15 reps)",
-                "Walking lunges (10 steps each leg)",
-              ],
+            day2: {
+              day: "Day 2 - Pull",
+              focus: "Back, Biceps",
               exercises: [
-                {
-                  name: "Barbell Back Squat",
-                  sets: 4,
-                  reps: 6,
-                },
-                {
-                  name: "Romanian Deadlift",
-                  sets: 3,
-                  reps: 8,
-                },
-                {
-                  name: "Leg Press",
-                  sets: 3,
-                  reps: 10,
-                },
-                {
-                  name: "Walking Lunges",
-                  sets: 3,
-                  reps: 12,
-                },
-                {
-                  name: "Standing Calf Raises",
-                  sets: 4,
-                  reps: 15,
-                },
-              ],
-              cooldown: [
-                "Quad stretch (30 seconds per leg)",
-                "Hamstring stretch (30 seconds per leg)",
-                "Calf stretch (30 seconds per leg)",
+                { name: "Deadlifts", sets: 4, reps: "6-8", rest: "3-4 min" },
+                { name: "Pull-ups", sets: 3, reps: "8-12", rest: "2 min" },
+                { name: "Barbell Rows", sets: 3, reps: "10-12", rest: "2 min" },
+                { name: "Lat Pulldowns", sets: 3, reps: "12-15", rest: "1.5 min" },
+                { name: "Bicep Curls", sets: 3, reps: "12-15", rest: "1 min" },
+                { name: "Hammer Curls", sets: 3, reps: "12-15", rest: "1 min" },
               ],
             },
-            {
-              day: "day3",
-              title: "Day 3: Rest or Active Recovery",
-              description: "Take a complete rest day or engage in light activities like walking, swimming, or yoga.",
-              warmup: [],
-              exercises: [],
-              cooldown: [],
-            },
-            {
-              day: "day4",
-              title: "Day 4: Upper Body Pull",
-              description: "Focus on back and biceps with a mix of vertical and horizontal pulling movements.",
-              warmup: [
-                "5 minutes of light cardio",
-                "Arm circles and scapular retractions",
-                "Band pull-aparts (10-15 reps)",
-              ],
+            day3: {
+              day: "Day 3 - Legs",
+              focus: "Quadriceps, Hamstrings, Glutes",
               exercises: [
-                {
-                  name: "Pull-ups or Assisted Pull-ups",
-                  sets: 4,
-                  reps: 6,
-                },
-                {
-                  name: "Seated Cable Row",
-                  sets: 3,
-                  reps: 8,
-                },
-                {
-                  name: "Single-Arm Dumbbell Row",
-                  sets: 3,
-                  reps: 10,
-                },
-                {
-                  name: "Barbell or Dumbbell Bicep Curls",
-                  sets: 3,
-                  reps: 10,
-                },
-                {
-                  name: "Face Pulls",
-                  sets: 3,
-                  reps: 12,
-                },
-              ],
-              cooldown: [
-                "Lat stretch (30 seconds per side)",
-                "Bicep stretch (30 seconds per arm)",
-                "Upper back stretch (30 seconds)",
+                { name: "Squats", sets: 4, reps: "8-10", rest: "3-4 min" },
+                { name: "Romanian Deadlifts", sets: 3, reps: "10-12", rest: "2-3 min" },
+                { name: "Leg Press", sets: 3, reps: "12-15", rest: "2 min" },
+                { name: "Leg Extensions", sets: 3, reps: "12-15", rest: "1.5 min" },
+                { name: "Leg Curls", sets: 3, reps: "12-15", rest: "1.5 min" },
+                { name: "Calf Raises", sets: 4, reps: "15-20", rest: "1 min" },
               ],
             },
-            {
-              day: "day5",
-              title: "Day 5: Lower Body & Core",
-              description: "Second lower body day with a focus on different movement patterns and core strength.",
-              warmup: [
-                "5 minutes of light cardio",
-                "Glute bridges (10-15 reps)",
-                "Bodyweight lunges (10 reps each leg)",
-              ],
+            day4: {
+              day: "Day 4 - Rest",
+              focus: "Active Recovery",
               exercises: [
-                {
-                  name: "Deadlift",
-                  sets: 4,
-                  reps: 5,
-                },
-                {
-                  name: "Bulgarian Split Squats",
-                  sets: 3,
-                  reps: 8,
-                },
-                {
-                  name: "Leg Curls",
-                  sets: 3,
-                  reps: 10,
-                },
-                {
-                  name: "Hanging Leg Raises",
-                  sets: 3,
-                  reps: 10,
-                },
-                {
-                  name: "Plank",
-                  sets: 3,
-                  reps: 30,
-                },
-              ],
-              cooldown: [
-                "Hip flexor stretch (30 seconds per side)",
-                "Lower back stretch (30 seconds)",
-                "Full body stretch (1-2 minutes)",
+                { name: "Light Stretching", sets: 1, reps: "10-15 min", rest: "N/A" },
+                { name: "Foam Rolling", sets: 1, reps: "10-15 min", rest: "N/A" },
+                { name: "Light Walking", sets: 1, reps: "20-30 min", rest: "N/A" },
               ],
             },
-          ],
-          notes:
-            "Progressive overload is key to success with this program. Aim to increase weight or reps each week. Make sure to track your workouts and adjust as needed based on your recovery. Ensure you're consuming adequate protein (1.6-2.2g per kg of bodyweight) and calories to support muscle growth. Get 7-9 hours of quality sleep each night for optimal recovery.",
-          aiGenerated: true,
+            day5: {
+              day: "Day 5 - Upper Body",
+              focus: "Chest, Back, Shoulders",
+              exercises: [
+                { name: "Incline Bench Press", sets: 4, reps: "8-10", rest: "2-3 min" },
+                { name: "Overhead Press", sets: 3, reps: "8-10", rest: "2 min" },
+                { name: "Dumbbell Rows", sets: 3, reps: "10-12", rest: "2 min" },
+                { name: "Push-ups", sets: 3, reps: "12-20", rest: "1.5 min" },
+                { name: "Face Pulls", sets: 3, reps: "12-15", rest: "1 min" },
+                { name: "Planks", sets: 3, reps: "30-60 sec", rest: "1 min" },
+              ],
+            },
+            day6: {
+              day: "Day 6 - Lower Body",
+              focus: "Legs, Core",
+              exercises: [
+                { name: "Front Squats", sets: 3, reps: "8-10", rest: "3 min" },
+                { name: "Bulgarian Split Squats", sets: 3, reps: "10-12", rest: "2 min" },
+                { name: "Hip Thrusts", sets: 3, reps: "12-15", rest: "2 min" },
+                { name: "Lunges", sets: 3, reps: "12-15", rest: "1.5 min" },
+                { name: "Russian Twists", sets: 3, reps: "20-30", rest: "1 min" },
+                { name: "Mountain Climbers", sets: 3, reps: "30-45 sec", rest: "1 min" },
+              ],
+            },
+            day7: {
+              day: "Day 7 - Rest",
+              focus: "Complete Rest",
+              exercises: [
+                { name: "Complete Rest Day", sets: 1, reps: "Full day", rest: "N/A" },
+                { name: "Light Stretching (Optional)", sets: 1, reps: "10-15 min", rest: "N/A" },
+              ],
+            },
+          },
         }
 
         setWorkoutPlan(mockWorkoutPlan)
         setLoading(false)
       } catch (error) {
-        handleApiError(error, toast, {
-          title: "Error loading workout plan",
-          fallbackMessage: "Failed to load your workout plan. Please try again later.",
+        console.error("Failed to fetch workout plan:", error)
+        toast.error("Failed to load workout plan", {
+          description: "The workout plan you&apos;re looking for doesn&apos;t exist or has been removed.",
         })
         setLoading(false)
       }
@@ -249,220 +149,154 @@ export default function AIGeneratedPlanPage() {
     fetchWorkoutPlan()
   }, [])
 
-  const handleSaveWorkout = () => {
-    toast.success("Workout plan saved", {
-        description: "Your AI-generated workout plan has been saved to your workouts.",
-      })
-  }
-
-  const handlePrintWorkout = () => {
-    window.print()
-  }
-
-  const handleDownloadWorkout = () => {
-    toast.info("Workout Plan Downloaded", {
-      description: "Your workout plan has been downloaded as a PDF.",
-    })
-  }
-
-  const handleShareWorkout = () => {
-    toast.info("Share Link Created", {
-      description: "A shareable link has been copied to your clipboard.",
-    })
-  }
-
   if (loading) {
     return (
-      <div className="container py-8 space-y-8">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <Skeleton className="h-8 w-1/3" />
+      <div className="container py-6 space-y-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-10" />
+          <Skeleton className="h-8 w-64" />
         </div>
-
-        <div className="space-y-6">
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-24 w-full" />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-          </div>
-
-          <Skeleton className="h-[500px] w-full" />
+        <Skeleton className="h-6 w-full" />
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <Skeleton key={index} className="h-32 w-full" />
+          ))}
         </div>
+        <Skeleton className="h-[400px] w-full" />
       </div>
     )
   }
 
   if (!workoutPlan) {
     return (
-      <div className="container py-8">
-        <div className="flex items-center gap-2 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
+      <div className="container py-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Workout Plan Not Found</h1>
+          <p>The workout plan you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+          <Button onClick={() => router.push("/workout-plans")} className="mt-4">
+            Back to Workout Plans
           </Button>
-          <h1 className="text-2xl font-bold">Workout Plan Not Found</h1>
         </div>
-                        <p>The workout plan you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-        <Button className="mt-4" onClick={() => router.push("/workout-plans")}>
-          Back to Workout Plans
-        </Button>
       </div>
     )
   }
 
   return (
-    <div className="container py-8 space-y-6">
-      <div className="flex items-center gap-2">
+    <div className="container py-6 space-y-6">
+      <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight">{workoutPlan.title}</h1>
-        {workoutPlan.aiGenerated && (
-          <Badge variant="secondary" className="ml-2 gap-1">
-            <Sparkles className="h-3.5 w-3.5" />
-            AI Generated
-          </Badge>
-        )}
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-between gap-4">
-        <div className="space-y-2">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline">{workoutPlan.goal}</Badge>
-            <Badge
-              variant={
-                workoutPlan.level === "beginner"
-                  ? "secondary"
-                  : workoutPlan.level === "intermediate"
-                    ? "default"
-                    : "destructive"
-              }
-              className="capitalize"
-            >
-              {workoutPlan.level}
-            </Badge>
-            <Badge variant="outline" className="gap-1">
-              <Calendar className="h-3.5 w-3.5" />
-              {workoutPlan.duration}
-            </Badge>
-          </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">{workoutPlan.title}</h1>
           <p className="text-muted-foreground">{workoutPlan.description}</p>
         </div>
-
-        <div className="flex flex-wrap gap-2">
-          <Button variant="outline" size="sm" className="gap-1" onClick={handleSaveWorkout}>
-            <Save className="h-4 w-4" />
-            Save
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1" onClick={handlePrintWorkout}>
-            <Printer className="h-4 w-4" />
-            Print
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1" onClick={handleDownloadWorkout}>
-            <Download className="h-4 w-4" />
-            Download
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1" onClick={handleShareWorkout}>
-            <Share2 className="h-4 w-4" />
-            Share
-          </Button>
-          <Button variant="outline" size="sm" className="gap-1" onClick={() => router.push("/workout-plans/edit")}>
-            <Edit className="h-4 w-4" />
-            Edit
-          </Button>
-        </div>
       </div>
 
-      <Tabs defaultValue={activeDay} onValueChange={setActiveDay} className="space-y-4">
-        <div className="overflow-x-auto pb-2">
-          <TabsList className="inline-flex w-auto">
-            {workoutPlan.schedule.map((day) => (
-              <TabsTrigger key={day.day} value={day.day}>
-                {day.title.split(":")[0]}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Level</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold capitalize">{workoutPlan.level}</div>
+            <p className="text-xs text-muted-foreground">Difficulty level</p>
+          </CardContent>
+        </Card>
 
-        {workoutPlan.schedule.map((day) => (
-          <TabsContent key={day.day} value={day.day} className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>{day.title}</CardTitle>
-                <CardDescription>{day.description}</CardDescription>
-              </CardHeader>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Duration</CardTitle>
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{workoutPlan.duration}</div>
+            <p className="text-xs text-muted-foreground">Program length</p>
+          </CardContent>
+        </Card>
 
-              {day.exercises.length > 0 ? (
-                <CardContent className="space-y-6">
-                  {day.warmup.length > 0 && (
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-medium">Warm-up</h3>
-                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                        {day.warmup.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Goal</CardTitle>
+            <Zap className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{workoutPlan.goal}</div>
+            <p className="text-xs text-muted-foreground">Primary objective</p>
+          </CardContent>
+        </Card>
 
-                  <div className="space-y-2">
-                    <h3 className="text-lg font-medium">Main Workout</h3>
-                    <div className="overflow-x-auto">
-                      <table className="w-full border-collapse">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="text-left py-2 px-4">Exercise</th>
-                            <th className="text-center py-2 px-4">Sets</th>
-                            <th className="text-center py-2 px-4">Reps</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {day.exercises.map((exercise, index) => (
-                            <tr key={index} className="border-b">
-                              <td className="py-3 px-4 font-medium">{exercise.name}</td>
-                              <td className="py-3 px-4 text-center">{exercise.sets}</td>
-                              <td className="py-3 px-4 text-center">{exercise.reps}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-
-                  {day.cooldown.length > 0 && (
-                    <div className="space-y-2">
-                      <h3 className="text-lg font-medium">Cool-down</h3>
-                      <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                        {day.cooldown.map((item, index) => (
-                          <li key={index}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </CardContent>
-              ) : (
-                <CardContent>
-                  <div className="p-6 text-center">
-                    <h3 className="text-lg font-medium mb-2">Rest Day</h3>
-                    <p className="text-muted-foreground">{day.description}</p>
-                  </div>
-                </CardContent>
-              )}
-            </Card>
-          </TabsContent>
-        ))}
-      </Tabs>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Workouts</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">7</div>
+            <p className="text-xs text-muted-foreground">Days per week</p>
+          </CardContent>
+        </Card>
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Program Notes</CardTitle>
+          <CardTitle>Weekly Schedule</CardTitle>
+          <CardDescription>Your personalized workout schedule for the week</CardDescription>
         </CardHeader>
         <CardContent>
-          <p>{workoutPlan.notes}</p>
+          <Tabs value={activeDay} onValueChange={setActiveDay} className="w-full">
+            <TabsList className="grid w-full grid-cols-7">
+              {Object.keys(workoutPlan.workouts).map((day) => (
+                <TabsTrigger key={day} value={day} className="text-xs">
+                  {workoutPlan.workouts[day].day.split(" - ")[0]}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+
+            {Object.keys(workoutPlan.workouts).map((day) => (
+              <TabsContent key={day} value={day} className="mt-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-xl font-semibold">{workoutPlan.workouts[day].day}</h3>
+                      <p className="text-muted-foreground">Focus: {workoutPlan.workouts[day].focus}</p>
+                    </div>
+                    <Badge variant="secondary">
+                      {workoutPlan.workouts[day].exercises.length} exercises
+                    </Badge>
+                  </div>
+
+                  <div className="space-y-4">
+                    {workoutPlan.workouts[day].exercises.map((exercise, index) => (
+                      <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div className="flex-1">
+                          <h4 className="font-medium">{exercise.name}</h4>
+                          {exercise.notes && (
+                            <p className="text-sm text-muted-foreground">{exercise.notes}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-4 text-sm">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span>{exercise.sets} sets</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Target className="h-4 w-4 text-muted-foreground" />
+                            <span>{exercise.reps}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <span>{exercise.rest}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </TabsContent>
+            ))}
+          </Tabs>
         </CardContent>
       </Card>
     </div>

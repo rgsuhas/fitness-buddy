@@ -16,10 +16,11 @@ import {
   Sparkles,
   Apple,
   Heart,
-  MessageSquare,
   Watch,
   ChevronLeft,
   ChevronRight,
+  List,
+  BookOpen,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -65,12 +66,7 @@ export function Sidebar() {
     {
       title: "My Workouts",
       href: "/my-workouts",
-      icon: DumbellIcon,
-    },
-    {
-      title: "Workouts",
-      href: "/workouts",
-      icon: DumbellIcon,
+      icon: BookOpen,
     },
     {
       title: "AI Workout Plans",
@@ -98,10 +94,11 @@ export function Sidebar() {
       icon: Users,
     },
     {
-      title: "Messages",
-      href: "/messages",
-      icon: MessageSquare,
+      title: "Workouts",
+      href: "/workouts",
+      icon: DumbellIcon,
     },
+
     {
       title: "Wearables",
       href: "/wearables",

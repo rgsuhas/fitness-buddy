@@ -2,63 +2,33 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { format } from "date-fns"
-import { CalendarIcon, ArrowLeft } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Switch } from "@/components/ui/switch"
+import { CalendarIcon, ArrowLeft } from "lucide-react"
+import { format } from "date-fns"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 import { toast } from "sonner"
-import { cn } from "@/lib/utils"
 
-const challengeFormSchema = z
-  .object({
-    title: z
-      .string()
-      .min(5, {
-        message: "Title must be at least 5 characters.",
-      })
-      .max(100, {
-        message: "Title must not exceed 100 characters.",
-      }),
-    description: z
-      .string()
-      .min(20, {
-        message: "Description must be at least 20 characters.",
-      })
-      .max(500, {
-        message: "Description must not exceed 500 characters.",
-      }),
-    category: z.string({
-      required_error: "Please select a category.",
-    }),
-    goal: z.string().min(1, {
-      message: "Please specify a goal.",
-    }),
-    goalType: z.string({
-      required_error: "Please select a goal type.",
-    }),
-    startDate: z.date({
-      required_error: "Start date is required.",
-    }),
-    endDate: z.date({
-      required_error: "End date is required.",
-    }),
-    isPrivate: z.boolean(),
-    inviteFriends: z.boolean(),
-  })
-  .refine((data) => data.endDate > data.startDate, {
-    message: "End date must be after start date.",
-    path: ["endDate"],
-  })
+const challengeFormSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  category: z.string().min(1, "Category is required"),
+  goal: z.string().min(1, "Goal is required"),
+  goalType: z.string().min(1, "Goal type is required"),
+  startDate: z.date(),
+  endDate: z.date(),
+  isPrivate: z.boolean(),
+  inviteFriends: z.boolean(),
+})
 
 type ChallengeFormValues = z.infer<typeof challengeFormSchema>
 
@@ -89,8 +59,7 @@ export default function CreateChallengePage() {
     try {
       setIsSubmitting(true)
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500))
+      // Remove artificial delay - submit immediately
 
       console.log("Challenge data:", data)
 
@@ -110,248 +79,197 @@ export default function CreateChallengePage() {
   }
 
   return (
-    <div className="container py-8 space-y-6">
-      <div className="flex items-center gap-2">
+    <div className="container py-6 space-y-6">
+      <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="h-5 w-5" />
+          <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight">Create a Challenge</h1>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Create Challenge</h1>
+          <p className="text-muted-foreground">Start a new fitness challenge for the community</p>
+        </div>
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>Challenge Details</CardTitle>
-          <CardDescription>Create a new fitness challenge to motivate yourself and others</CardDescription>
+          <CardDescription>Fill in the details for your new fitness challenge</CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Challenge Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="E.g., 30-Day Push-up Challenge" {...field} />
-                    </FormControl>
-                    <FormDescription>Give your challenge a catchy and descriptive title.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Describe what the challenge involves and how to participate..."
-                        className="min-h-[120px]"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormDescription>Provide clear instructions and motivation for participants.</FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a category" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="strength">Strength Training</SelectItem>
-                          <SelectItem value="cardio">Cardio</SelectItem>
-                          <SelectItem value="flexibility">Flexibility</SelectItem>
-                          <SelectItem value="endurance">Endurance</SelectItem>
-                          <SelectItem value="weight-loss">Weight Loss</SelectItem>
-                          <SelectItem value="steps">Steps</SelectItem>
-                          <SelectItem value="nutrition">Nutrition</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="title">Challenge Title</Label>
+                <Input
+                  id="title"
+                  placeholder="Enter challenge title"
+                  {...form.register("title")}
                 />
+                {form.formState.errors.title && (
+                  <p className="text-sm text-red-500">{form.formState.errors.title.message}</p>
+                )}
+              </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="goal"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Goal</FormLabel>
-                        <FormControl>
-                          <Input type="text" placeholder="E.g., 100, 10km" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+              <div className="space-y-2">
+                <Label htmlFor="category">Category</Label>
+                <Select onValueChange={(value) => form.setValue("category", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="strength">Strength Training</SelectItem>
+                    <SelectItem value="cardio">Cardio</SelectItem>
+                    <SelectItem value="flexibility">Flexibility</SelectItem>
+                    <SelectItem value="weight-loss">Weight Loss</SelectItem>
+                    <SelectItem value="muscle-gain">Muscle Gain</SelectItem>
+                    <SelectItem value="endurance">Endurance</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.category && (
+                  <p className="text-sm text-red-500">{form.formState.errors.category.message}</p>
+                )}
+              </div>
+            </div>
 
-                  <FormField
-                    control={form.control}
-                    name="goalType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Goal Type</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Type" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            <SelectItem value="reps">Repetitions</SelectItem>
-                            <SelectItem value="distance">Distance (km/mi)</SelectItem>
-                            <SelectItem value="weight">Weight (kg/lb)</SelectItem>
-                            <SelectItem value="time">Time (minutes)</SelectItem>
-                            <SelectItem value="days">Days</SelectItem>
-                            <SelectItem value="steps">Steps</SelectItem>
-                            <SelectItem value="calories">Calories</SelectItem>
-                            <SelectItem value="custom">Custom</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                placeholder="Describe your challenge..."
+                className="min-h-[100px]"
+                {...form.register("description")}
+              />
+              {form.formState.errors.description && (
+                <p className="text-sm text-red-500">{form.formState.errors.description.message}</p>
+              )}
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="goal">Goal</Label>
+                <Input
+                  id="goal"
+                  placeholder="e.g., 100 push-ups"
+                  {...form.register("goal")}
+                />
+                {form.formState.errors.goal && (
+                  <p className="text-sm text-red-500">{form.formState.errors.goal.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="goalType">Goal Type</Label>
+                <Select onValueChange={(value) => form.setValue("goalType", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select goal type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="reps">Repetitions</SelectItem>
+                    <SelectItem value="distance">Distance</SelectItem>
+                    <SelectItem value="time">Time</SelectItem>
+                    <SelectItem value="weight">Weight</SelectItem>
+                    <SelectItem value="streak">Streak</SelectItem>
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.goalType && (
+                  <p className="text-sm text-red-500">{form.formState.errors.goalType.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label>Start Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.watch("startDate") ? (
+                        format(form.watch("startDate"), "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={form.watch("startDate")}
+                      onSelect={(date) => form.setValue("startDate", date || new Date())}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label>End Date</Label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {form.watch("endDate") ? (
+                        format(form.watch("endDate"), "PPP")
+                      ) : (
+                        <span>Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={form.watch("endDate")}
+                      onSelect={(date) => form.setValue("endDate", date || new Date())}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Private Challenge</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Only invited friends can join this challenge
+                  </p>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="startDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>Start Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground",
-                              )}
-                            >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="endDate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col">
-                      <FormLabel>End Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <FormControl>
-                            <Button
-                              variant={"outline"}
-                              className={cn(
-                                "w-full pl-3 text-left font-normal",
-                                !field.value && "text-muted-foreground",
-                              )}
-                            >
-                              {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </Button>
-                          </FormControl>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={field.value}
-                            onSelect={field.onChange}
-                            disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                <Switch
+                  checked={form.watch("isPrivate")}
+                  onCheckedChange={(checked) => form.setValue("isPrivate", checked)}
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FormField
-                  control={form.control}
-                  name="isPrivate"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Private Challenge</FormLabel>
-                        <FormDescription>Make this challenge visible only to invited participants</FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="inviteFriends"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Invite Friends</FormLabel>
-                        <FormDescription>Invite your friends to join this challenge</FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItem>
-                  )}
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label>Invite Friends</Label>
+                  <p className="text-sm text-muted-foreground">
+                    Send invitations to your friends
+                  </p>
+                </div>
+                <Switch
+                  checked={form.watch("inviteFriends")}
+                  onCheckedChange={(checked) => form.setValue("inviteFriends", checked)}
                 />
               </div>
+            </div>
 
-              <div className="flex justify-end gap-4">
-                <Button type="button" variant="outline" onClick={() => router.back()}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Creating..." : "Create Challenge"}
-                </Button>
-              </div>
-            </form>
-          </Form>
+            <div className="flex gap-4">
+              <Button type="submit" disabled={isSubmitting} className="flex-1">
+                {isSubmitting ? "Creating..." : "Create Challenge"}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => router.back()}>
+                Cancel
+              </Button>
+            </div>
+          </form>
         </CardContent>
       </Card>
     </div>

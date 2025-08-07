@@ -2,30 +2,24 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import Image from "next/image"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
+import { ArrowLeft, Bookmark, Share2, Play, Target, Zap, Clock } from "lucide-react"
 import { toast } from "sonner"
-import { ArrowLeft, Play, Bookmark, Share2, ThumbsUp } from "lucide-react"
+import Image from "next/image"
 
 interface Exercise {
   id: string
   name: string
   muscleGroup: string
   equipment: string
-  difficulty: "beginner" | "intermediate" | "advanced"
+  difficulty: string
   description: string
   instructions: string[]
-  videoUrl?: string
-  imageUrl: string
-  relatedExercises: {
-    id: string
-    name: string
-    imageUrl: string
-  }[]
+  tips: string[]
+  imageUrl?: string
 }
 
 export default function ExerciseDetailPage() {
@@ -33,14 +27,14 @@ export default function ExerciseDetailPage() {
   const router = useRouter()
   
   const [exercise, setExercise] = useState<Exercise | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Changed to false for immediate loading
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
     const fetchExerciseDetails = async () => {
       try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        setLoading(true)
+        // Remove artificial delay - load immediately
 
         // Mock data for demonstration
         const mockExercise: Exercise = {
@@ -72,260 +66,216 @@ export default function ExerciseDetailPage() {
                   ? "intermediate"
                   : "beginner",
           description:
-            "This exercise is a compound movement that targets multiple muscle groups and is essential for building strength and muscle mass.",
+            params.id === "ex1"
+              ? "A compound exercise that primarily targets the chest muscles, with secondary involvement of the shoulders and triceps."
+              : params.id === "ex2"
+                ? "A bodyweight exercise that targets the back and biceps, requiring significant upper body strength."
+                : params.id === "ex3"
+                  ? "A fundamental lower body exercise that targets the quadriceps, hamstrings, and glutes."
+                  : "A comprehensive exercise targeting multiple muscle groups.",
           instructions: [
-            "Start by positioning yourself correctly with proper form",
-            "Engage your core and maintain a neutral spine throughout the movement",
-            "Perform the movement with controlled tempo, focusing on the muscle contraction",
-            "Exhale during the exertion phase and inhale during the return phase",
-            "Complete the recommended number of repetitions while maintaining proper form",
+            "Start with proper form and warm-up",
+            "Maintain controlled movement throughout",
+            "Focus on breathing and muscle engagement",
+            "Complete the recommended sets and reps",
+            "Allow adequate rest between sets",
           ],
-          videoUrl: "https://example.com/video.mp4",
-          imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
-          relatedExercises: [
-            {
-              id: "ex4",
-              name: "Shoulder Press",
-              imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
-            },
-            {
-              id: "ex5",
-              name: "Bicep Curl",
-              imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=400&h=300&fit=crop&crop=center",
-            },
-            {
-              id: "ex6",
-              name: "Plank",
-              imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=300&fit=crop&crop=center",
-            },
+          tips: [
+            "Keep your core engaged throughout the movement",
+            "Maintain proper form over heavy weight",
+            "Listen to your body and adjust as needed",
+            "Consider working with a spotter for safety",
           ],
+          imageUrl: params.id === "ex1" ? "/images/workout-1.jpg" : params.id === "ex2" ? "/images/workout-2.jpg" : params.id === "ex3" ? "/images/workout-3.jpg" : "/images/workout-4.jpg",
         }
 
         setExercise(mockExercise)
         setLoading(false)
       } catch (error) {
         console.error("Failed to fetch exercise details:", error)
-        toast.error("Failed to add exercise", {
-        description: "There was an error adding the exercise. Please try again.",
-      })
+        toast.error("Failed to load exercise details")
         setLoading(false)
       }
     }
 
-    if (params.id) {
-      fetchExerciseDetails()
-    }
+    fetchExerciseDetails()
   }, [params.id])
 
-  const handleSaveExercise = () => {
+  const handleSave = () => {
     setSaved(!saved)
-    toast.info(saved ? "Exercise removed" : "Exercise saved", {
-      description: saved ? "Exercise removed from your saved list" : "Exercise added to your saved list",
+    toast.success(saved ? "Removed from favorites" : "Added to favorites", {
+      description: saved ? "Exercise removed from your favorites." : "Exercise added to your favorites.",
     })
   }
 
-  const handleAddToWorkout = () => {
-    toast.success("Exercise added", {
-        description: "This exercise has been added to your workout plan.",
-      })
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href)
+    toast.success("Link copied to clipboard", {
+      description: "Share this exercise with others!",
+    })
   }
 
   if (loading) {
     return (
-      <div className="container py-8 space-y-8">
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <Skeleton className="h-8 w-1/3" />
+      <div className="container py-6 space-y-6">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-10" />
+          <Skeleton className="h-8 w-64" />
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <Skeleton className="h-[400px] w-full rounded-lg" />
+        <div className="grid gap-6 md:grid-cols-2">
+          <Skeleton className="h-[400px] w-full" />
           <div className="space-y-4">
-            <Skeleton className="h-10 w-3/4" />
-            <Skeleton className="h-6 w-1/2" />
-            <Skeleton className="h-6 w-1/3" />
-            <Skeleton className="h-24 w-full" />
-            <div className="flex gap-2">
-              <Skeleton className="h-10 w-32" />
-              <Skeleton className="h-10 w-32" />
-            </div>
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+            <Skeleton className="h-4 w-4/5" />
           </div>
         </div>
-
-        <Skeleton className="h-12 w-full" />
-        <Skeleton className="h-64 w-full" />
       </div>
     )
   }
 
   if (!exercise) {
     return (
-      <div className="container py-8">
-        <div className="flex items-center gap-2 mb-6">
-          <Button variant="ghost" size="icon" onClick={() => router.back()}>
-            <ArrowLeft className="h-5 w-5" />
+      <div className="container py-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Exercise Not Found</h1>
+          <p>The exercise you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+          <Button onClick={() => router.push("/exercises")} className="mt-4">
+            Back to Exercises
           </Button>
-          <h1 className="text-2xl font-bold">Exercise Not Found</h1>
         </div>
-        <p>The exercise you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-        <Button className="mt-4" onClick={() => router.push("/exercises")}>
-          Back to Exercises
-        </Button>
       </div>
     )
   }
 
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "beginner":
+        return "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+      case "intermediate":
+        return "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
+      case "advanced":
+        return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300"
+    }
+  }
+
   return (
-    <div className="container py-8 space-y-8">
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" onClick={() => router.back()} aria-label="Go back">
-          <ArrowLeft className="h-5 w-5" />
+    <div className="container py-6 space-y-6">
+      <div className="flex items-center gap-4">
+        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4" />
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight">{exercise.name}</h1>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div className="rounded-lg overflow-hidden relative group">
-          <Image
-            src={exercise.imageUrl || "/placeholder.svg?height=400&width=600"}
-            alt={exercise.name}
-            layout="fill"
-            objectFit="cover"
-            className="w-full h-[400px]"
-          />
-          {exercise.videoUrl && (
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
-              <Button size="lg" className="gap-2">
-                <Play className="h-5 w-5" />
-                Watch Video
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="outline" className="text-sm">
-              {exercise.muscleGroup}
-            </Badge>
-            <Badge variant="outline" className="text-sm">
-              {exercise.equipment}
-            </Badge>
-            <Badge
-              variant={
-                exercise.difficulty === "beginner"
-                  ? "secondary"
-                  : exercise.difficulty === "intermediate"
-                    ? "default"
-                    : "destructive"
-              }
-              className="text-sm capitalize"
-            >
-              {exercise.difficulty}
-            </Badge>
-          </div>
-
+        <div className="flex-1">
+          <h1 className="text-3xl font-bold tracking-tight">{exercise.name}</h1>
           <p className="text-muted-foreground">{exercise.description}</p>
-
-          <div className="flex flex-wrap gap-2 pt-4">
-            <Button onClick={handleAddToWorkout} className="gap-2">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
-                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
-                <line x1="6" y1="1" x2="6" y2="4"></line>
-                <line x1="10" y1="1" x2="10" y2="4"></line>
-                <line x1="14" y1="1" x2="14" y2="4"></line>
-              </svg>
-              Add to Workout
-            </Button>
-
-            <Button variant="outline" onClick={handleSaveExercise} className="gap-2">
-              <Bookmark className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
-              {saved ? "Saved" : "Save"}
-            </Button>
-
-            <Button variant="ghost" size="icon" aria-label="Share exercise">
-              <Share2 className="h-4 w-4" />
-            </Button>
-
-            <Button variant="ghost" size="icon" aria-label="Like exercise">
-              <ThumbsUp className="h-4 w-4" />
-            </Button>
-          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="icon" onClick={handleSave}>
+            <Bookmark className={`h-4 w-4 ${saved ? "fill-current" : ""}`} />
+          </Button>
+          <Button variant="outline" size="icon" onClick={handleShare}>
+            <Share2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 
-      <Tabs defaultValue="instructions" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:w-auto md:inline-flex">
-          <TabsTrigger value="instructions">Instructions</TabsTrigger>
-          <TabsTrigger value="related">Related Exercises</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="instructions" className="mt-6">
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Step-by-Step Instructions</CardTitle>
-              <CardDescription>Follow these steps to perform the exercise correctly</CardDescription>
+              <CardTitle>Exercise Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Muscle Group</p>
+                    <p className="text-sm text-muted-foreground">{exercise.muscleGroup}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Zap className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Equipment</p>
+                    <p className="text-sm text-muted-foreground">{exercise.equipment}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm font-medium">Difficulty</p>
+                    <Badge className={`${getDifficultyColor(exercise.difficulty)} capitalize`}>
+                      {exercise.difficulty}
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Instructions</CardTitle>
             </CardHeader>
             <CardContent>
-              <ol className="space-y-4 list-decimal list-inside">
+              <ol className="list-decimal list-inside space-y-2">
                 {exercise.instructions.map((instruction, index) => (
-                  <li key={index} className="pl-2">
-                    <span className="font-medium text-lg mr-2">{index + 1}.</span>
-                    {instruction}
-                  </li>
+                  <li key={index} className="text-sm">{instruction}</li>
                 ))}
               </ol>
             </CardContent>
-            <CardFooter>
-              <p className="text-sm text-muted-foreground">
-                Always consult with a fitness professional if you&apos;re unsure about proper form.
-              </p>
-            </CardFooter>
           </Card>
-        </TabsContent>
 
-        <TabsContent value="related" className="mt-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {exercise.relatedExercises.map((relatedExercise) => (
-              <Card key={relatedExercise.id} className="overflow-hidden">
-                <div className="h-[200px] overflow-hidden relative">
-                  <Image
-                    src={relatedExercise.imageUrl || "/placeholder.svg?height=200&width=300"}
-                    alt={relatedExercise.name}
-                    layout="fill"
-                    objectFit="cover"
-                  />
-                </div>
-                <CardHeader className="p-4">
-                  <CardTitle className="text-lg">{relatedExercise.name}</CardTitle>
-                </CardHeader>
-                <CardFooter className="p-4 pt-0">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => router.push(`/exercises/${relatedExercise.id}`)}
-                  >
-                    View Exercise
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+          <Card>
+            <CardHeader>
+              <CardTitle>Tips</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ul className="list-disc list-inside space-y-2">
+                {exercise.tips.map((tip, index) => (
+                  <li key={index} className="text-sm">{tip}</li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Exercise Image</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="rounded-lg overflow-hidden relative group">
+                <Image
+                  src={exercise.imageUrl || "/placeholder.svg?height=400&width=600"}
+                  alt={exercise.name}
+                  layout="fill"
+                  objectFit="cover"
+                  className="w-full h-[400px]"
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Start Workout</CardTitle>
+              <CardDescription>Begin your workout with this exercise</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button className="w-full" size="lg">
+                <Play className="mr-2 h-4 w-4" />
+                Start Exercise
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }

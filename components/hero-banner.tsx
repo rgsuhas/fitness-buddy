@@ -13,11 +13,12 @@ export function HeroBanner() {
           layout="fill"
           objectFit="cover"
           quality={100}
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-black/50 dark:from-black/90 dark:to-black/70" />
       </div>
 
-      <div className="py-24 sm:py-32 px-6 max-w-7xl mx-auto">
+      <div className="py-24 sm:py-32 px-6 max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col items-start max-w-3xl">
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl mb-4">
             Achieve Your Fitness Goals Together
@@ -27,7 +28,7 @@ export function HeroBanner() {
             Personalized AI-Powered Workout Plans | Track Your Progress | Join Fitness Challenges
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 relative z-20">
             <Button
               size="lg"
               className="w-full sm:w-auto bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white"
@@ -52,7 +53,7 @@ export function HeroBanner() {
       </div>
 
       {/* Key Features Section */}
-      <div className="bg-black/80 backdrop-blur-sm py-12 px-6">
+      <div className="bg-black/80 backdrop-blur-sm py-12 px-6 relative z-10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div className="flex flex-col items-center text-center">
             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mb-4">

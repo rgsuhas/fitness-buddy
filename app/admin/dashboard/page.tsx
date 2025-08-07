@@ -1,65 +1,33 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useUser } from "@/lib/hooks/use-user"
 import { redirect } from "next/navigation"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Input } from "@/components/ui/input"
-import { ChartContainer, ChartTooltip } from "@/components/ui/chart"
-import { ChartTooltipContent } from "@/components/ui/chart-tooltip-content"
-
-import {
-  AreaChart,
-  Area,
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-  Legend,
-} from "recharts"
-import { UsersTable } from "@/components/admin/users-table"
-import { ExercisesTable } from "@/components/admin/exercises-table"
-import { WorkoutsTable } from "@/components/admin/workouts-table"
-import {
-  AlertCircle,
-  UserPlus,
-  ChevronUp,
-  ChevronDown,
-  DumbbellIcon as DumbellIcon,
-  Users,
-  Activity,
-  Search,
-} from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, PieChart, Pie, Cell } from "recharts"
+import { Users, TrendingUp, Activity, Target, Calendar, Clock } from "lucide-react"
 
 // Mock data for charts
 const userGrowthData = [
-  { month: "Jan", users: 1200 },
-  { month: "Feb", users: 1900 },
-  { month: "Mar", users: 3000 },
-  { month: "Apr", users: 4780 },
-  { month: "May", users: 5890 },
-  { month: "Jun", users: 6390 },
-  { month: "Jul", users: 7490 },
+  { month: "Jan", users: 120 },
+  { month: "Feb", users: 180 },
+  { month: "Mar", users: 220 },
+  { month: "Apr", users: 280 },
+  { month: "May", users: 320 },
+  { month: "Jun", users: 380 },
 ]
 
-const activityData = [
-  { day: "Mon", workouts: 2300, plans: 1200, challenges: 400 },
-  { day: "Tue", workouts: 1890, plans: 1108, challenges: 380 },
-  { day: "Wed", workouts: 2350, plans: 1380, challenges: 430 },
-  { day: "Thu", workouts: 3490, plans: 1700, challenges: 590 },
-  { day: "Fri", workouts: 2900, plans: 1400, challenges: 470 },
-  { day: "Sat", workouts: 3200, plans: 1500, challenges: 520 },
-  { day: "Sun", workouts: 2500, plans: 1300, challenges: 450 },
+const workoutActivityData = [
+  { day: "Mon", workouts: 45 },
+  { day: "Tue", workouts: 52 },
+  { day: "Wed", workouts: 48 },
+  { day: "Thu", workouts: 61 },
+  { day: "Fri", workouts: 55 },
+  { day: "Sat", workouts: 38 },
+  { day: "Sun", workouts: 42 },
 ]
 
 const usersByGoalData = [
@@ -74,7 +42,7 @@ const COLORS = ["#3b82f6", "#ef4444", "#22c55e", "#eab308", "#8b5cf6"]
 
 export default function AdminDashboardPage() {
   const { user, loading } = useUser()
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false) // Changed to false for immediate loading
 
   useEffect(() => {
     // Check if user is admin, if not redirect
@@ -82,12 +50,8 @@ export default function AdminDashboardPage() {
       redirect("/auth/login")
     }
 
-    // Simulate loading dashboard data
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1500)
-
-    return () => clearTimeout(timer)
+    // Remove artificial delay - load immediately
+    setIsLoading(false)
   }, [user, loading])
 
   if (loading || isLoading) {
@@ -104,264 +68,201 @@ export default function AdminDashboardPage() {
     )
   }
 
+  if (!user || user.role !== "admin") {
+    return null
+  }
+
   return (
     <div className="container py-6 space-y-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Manage your platform, users, workouts, and gain insights</p>
+        <p className="text-muted-foreground">Monitor and manage your fitness platform</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Total Users</p>
-                <div className="flex items-baseline gap-2">
-                  <h3 className="text-2xl font-bold">7,495</h3>
-                  <Badge variant="secondary" className="gap-1">
-                    <ChevronUp className="h-3.5 w-3.5" />
-                    <span>12.5%</span>
-                  </Badge>
-                </div>
-              </div>
-              <div className="p-3 rounded-full bg-blue-100 text-blue-500">
-                <UserPlus className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Active Workouts</p>
-                <div className="flex items-baseline gap-2">
-                  <h3 className="text-2xl font-bold">12,453</h3>
-                  <Badge variant="secondary" className="gap-1">
-                    <ChevronUp className="h-3.5 w-3.5" />
-                    <span>8.2%</span>
-                  </Badge>
-                </div>
-              </div>
-              <div className="p-3 rounded-full bg-green-100 text-green-500">
-                <DumbellIcon className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Active Challenges</p>
-                <div className="flex items-baseline gap-2">
-                  <h3 className="text-2xl font-bold">45</h3>
-                  <Badge variant="secondary" className="gap-1">
-                    <ChevronUp className="h-3.5 w-3.5" />
-                    <span>15.3%</span>
-                  </Badge>
-                </div>
-              </div>
-              <div className="p-3 rounded-full bg-orange-100 text-orange-500">
-                <Users className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Weekly Engagement</p>
-                <div className="flex items-baseline gap-2">
-                  <h3 className="text-2xl font-bold">68.7%</h3>
-                  <Badge variant="destructive" className="gap-1">
-                    <ChevronDown className="h-3.5 w-3.5" />
-                    <span>3.2%</span>
-                  </Badge>
-                </div>
-              </div>
-              <div className="p-3 rounded-full bg-purple-100 text-purple-500">
-                <Activity className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Alert variant="destructive">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>System Alert</AlertTitle>
-        <AlertDescription>
-          There are 5 failed AI workout generation attempts in the last hour. The AI service might be experiencing
-          issues.
-        </AlertDescription>
-      </Alert>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>User Growth</CardTitle>
-            <CardDescription>Monthly user registrations</CardDescription>
-          </CardHeader>
-          <CardContent className="px-2">
-            <ChartContainer
-              config={{
-                users: {
-                  label: "User Registrations",
-                  color: "hsl(var(--chart-1))",
-                },
-              }}
-              className="h-[300px]"
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={userGrowthData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-users)" stopOpacity={0.8} />
-                      <stop offset="95%" stopColor="var(--color-users)" stopOpacity={0.1} />
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="month" />
-                  <YAxis />
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                  <Tooltip content={<ChartTooltipContent />} />
-                  <Area
-                    type="monotone"
-                    dataKey="users"
-                    stroke="var(--color-users)"
-                    fillOpacity={1}
-                    fill="url(#colorUsers)"
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>User Distribution by Fitness Goal</CardTitle>
-            <CardDescription>Percentage of users for each fitness goal</CardDescription>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={usersByGoalData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {usersByGoalData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    formatter={(value) => [`${value}%`, "Percentage"]}
-                    contentStyle={{ backgroundColor: "var(--background)", border: "1px solid var(--border)" }}
-                  />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
+            <div className="text-2xl font-bold">2,847</div>
+            <p className="text-xs text-muted-foreground">+12% from last month</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Workouts</CardTitle>
+            <Activity className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">1,234</div>
+            <p className="text-xs text-muted-foreground">+8% from last week</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Avg. Session Time</CardTitle>
+            <Clock className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">42 min</div>
+            <p className="text-xs text-muted-foreground">+5% from last month</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Completion Rate</CardTitle>
+            <Target className="h-4 w-4 text-muted-foreground" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">78%</div>
+            <p className="text-xs text-muted-foreground">+3% from last month</p>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Platform Activity</CardTitle>
-          <CardDescription>Daily usage across key features</CardDescription>
-        </CardHeader>
-        <CardContent className="px-2">
-          <ChartContainer
-            config={{
-              workouts: {
-                label: "Workout Sessions",
-                color: "hsl(var(--chart-1))",
-              },
-              plans: {
-                label: "Workout Plans",
-                color: "hsl(var(--chart-2))",
-              },
-              challenges: {
-                label: "Challenges",
-                color: "hsl(var(--chart-3))",
-              },
-            }}
-            className="h-[350px]"
-          >
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={activityData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Legend />
-                <Bar dataKey="workouts" fill="var(--color-workouts)" />
-                <Bar dataKey="plans" fill="var(--color-plans)" />
-                <Bar dataKey="challenges" fill="var(--color-challenges)" />
-              </BarChart>
-            </ResponsiveContainer>
-          </ChartContainer>
-        </CardContent>
-      </Card>
+      <Tabs defaultValue="overview" className="space-y-6">
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="workouts">Workouts</TabsTrigger>
+        </TabsList>
 
-      <Tabs defaultValue="users" className="space-y-4">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <TabsList>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="workouts">Workouts</TabsTrigger>
-            <TabsTrigger value="exercises">Exercises</TabsTrigger>
-          </TabsList>
-          <div className="w-full sm:w-auto flex items-center relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9 w-full sm:w-[250px]" placeholder="Search..." />
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Growth</CardTitle>
+                <CardDescription>Monthly user registration trends</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    users: {
+                      label: "Users",
+                      color: "hsl(var(--chart-1))",
+                    },
+                  }}
+                  className="h-[250px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={userGrowthData}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="users" fill="var(--color-users)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Weekly Workout Activity</CardTitle>
+                <CardDescription>Daily workout completion rates</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    workouts: {
+                      label: "Workouts",
+                      color: "hsl(var(--chart-2))",
+                    },
+                  }}
+                  className="h-[250px]"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={workoutActivityData}>
+                      <CartesianGrid strokeDasharray="3 3" opacity={0.3} />
+                      <XAxis dataKey="day" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="workouts" fill="var(--color-workouts)" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </ChartContainer>
+              </CardContent>
+            </Card>
           </div>
-        </div>
 
-        <TabsContent value="users" className="m-0 space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>User Goals Distribution</CardTitle>
+              <CardDescription>Breakdown of user fitness goals</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  value: {
+                    label: "Users",
+                    color: "hsl(var(--chart-3))",
+                  },
+                }}
+                className="h-[250px]"
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={usersByGoalData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={80}
+                      fill="var(--color-value)"
+                      dataKey="value"
+                    >
+                      {usersByGoalData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="users" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>User Management</CardTitle>
-              <CardDescription>Manage users, review profiles, and adjust permissions</CardDescription>
+              <CardDescription>Manage user accounts and permissions</CardDescription>
             </CardHeader>
             <CardContent>
-              <UsersTable />
+              <div className="text-center py-8">
+                <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">User Management</h3>
+                <p className="text-muted-foreground">
+                  Advanced user management features coming soon.
+                </p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="workouts" className="m-0 space-y-4">
+        <TabsContent value="workouts" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Workout Management</CardTitle>
-              <CardDescription>Manage workout plans and user-created workouts</CardDescription>
+              <CardTitle>Workout Analytics</CardTitle>
+              <CardDescription>Detailed workout performance metrics</CardDescription>
             </CardHeader>
             <CardContent>
-              <WorkoutsTable />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="exercises" className="m-0 space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Exercise Library</CardTitle>
-              <CardDescription>Manage exercises, categories, and instructional content</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ExercisesTable />
+              <div className="text-center py-8">
+                <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium mb-2">Workout Analytics</h3>
+                <p className="text-muted-foreground">
+                  Advanced workout analytics features coming soon.
+                </p>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>

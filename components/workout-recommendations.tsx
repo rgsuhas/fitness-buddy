@@ -23,7 +23,7 @@ interface Workout {
 
 export function WorkoutRecommendations() {
   const [workouts, setWorkouts] = useState<Workout[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -32,8 +32,7 @@ export function WorkoutRecommendations() {
         setLoading(true)
         setError(null)
         
-        // Simulate API call with delay
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Remove artificial delay for better UX
         
         // Mock data - in production, this would be an API call
         const mockWorkouts: Workout[] = [

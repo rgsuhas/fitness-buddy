@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Heart, MessageSquare, Share2, ChevronUp, UserPlus, Trophy, Target, Search, Filter, Plus, Image, Send } from "lucide-react"
+import { Heart, Share2, ChevronUp, UserPlus, Trophy, Target, Search, Filter, Plus, Image, Send } from "lucide-react"
 import { toast } from "sonner"
 import { useUser } from "@/lib/hooks/use-user"
 import { communityService, type Post } from "@/lib/services/community"
@@ -54,7 +54,7 @@ export default function CommunityPage() {
 
   // State management
   const [activeTab, setActiveTab] = useState<string>(tabParam || "feed")
-  const [loading, setLoading] = useState<boolean>(true)
+  const [loading, setLoading] = useState<boolean>(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [posts, setPosts] = useState<PostWithMeta[]>([])
   const [buddies, setBuddies] = useState<FitnessBuddy[]>([])

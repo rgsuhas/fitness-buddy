@@ -27,7 +27,6 @@ interface UserSettings {
     email: boolean
     push: boolean
     challenges: boolean
-    messages: boolean
   }
   preferences: {
     theme: string
@@ -55,7 +54,6 @@ export default function SettingsPage() {
       email: true,
       push: true,
       challenges: true,
-      messages: true,
     },
     preferences: {
       theme: theme || "dark",
@@ -164,22 +162,7 @@ export default function SettingsPage() {
                   }
                 />
               </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="message-notifications">Message Notifications</Label>
-                <Switch
-                  id="message-notifications"
-                  checked={settings.notifications.messages}
-                  onCheckedChange={(checked: boolean) =>
-                    setSettings({
-                      ...settings,
-                      notifications: {
-                        ...settings.notifications,
-                        messages: checked,
-                      },
-                    })
-                  }
-                />
-              </div>
+
             </CardContent>
           </Card>
 

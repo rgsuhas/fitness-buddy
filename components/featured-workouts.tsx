@@ -21,7 +21,7 @@ interface Workout {
 
 export function FeaturedWorkouts() {
   const [workouts, setWorkouts] = useState<Workout[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
   
 

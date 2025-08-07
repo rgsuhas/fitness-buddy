@@ -1,18 +1,15 @@
 import { test, expect } from '@playwright/test';
 
-test('has title', async ({ page }) => {
-  await page.goto('/');
+test('get started link', async ({ page }) => {
+  await page.goto('http://localhost:3000');
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/Fitness Buddy/);
-});
-
-test('get started link', async ({ page }) => {
-  await page.goto('/');
 
   // Click the get started link.
   await page.getByRole('link', { name: 'Get Started Now' }).click();
 
-  // Expects page to have a heading with the name of the current URL.
+  // Wait for navigation and expect the page to have a heading with the name of the current URL.
+  await page.waitForURL('**/auth/register');
   await expect(page.getByRole('heading', { name: 'Create an account' })).toBeVisible();
 });

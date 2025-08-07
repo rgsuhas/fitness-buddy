@@ -62,17 +62,7 @@ export default function LoginPage() {
     setFormError("");
 
     try {
-      // Add a small delay to ensure the loading state is visible
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // This part needs to be updated to use NextAuth.js credentials provider if you want email/password login
-      // For now, it's commented out as we are focusing on social login
-      // const success = await signIn('credentials', { email, password, redirect: false });
-      // if (success?.error) {
-      //   setFormError(success.error);
-      // } else {
-      //   router.push("/dashboard");
-      // }
+      // Remove artificial delay for better UX
       setFormError("Email/password login is not currently supported. Please use social login.");
 
     } catch (error) {

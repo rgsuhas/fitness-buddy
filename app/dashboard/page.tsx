@@ -64,7 +64,7 @@ const statsCards = [
 export default function DashboardPage() {
   const { user, loading } = useUser()
   
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false) // Changed to false for immediate loading
 
   useEffect(() => {
     // If user is not logged in and not still loading, redirect to login
@@ -72,12 +72,8 @@ export default function DashboardPage() {
       redirect("/auth/login")
     }
 
-    // Simulate loading dashboard data
-    const timer = setTimeout(() => {
-      setIsLoading(false)
-    }, 1500)
-
-    return () => clearTimeout(timer)
+    // Remove artificial delay - load immediately
+    setIsLoading(false)
   }, [user, loading])
 
   if (loading) {
@@ -93,27 +89,30 @@ export default function DashboardPage() {
     )
   }
 
+  if (!user) {
+    return null
+  }
+
   return (
-    <div className="container py-6 space-y-8">
+    <div className="container py-6 space-y-6">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user?.name?.split(" ")[0] || "User"}</h1>
         <p className="text-muted-foreground">Here&apos;s an overview of your fitness journey</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        {statsCards.map((card, index) => (
-          <Card key={index}>
+      {/* Stats Cards */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {statsCards.map((card) => (
+          <Card key={card.title}>
             <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium">{card.title}</p>
-                  <div className="flex items-baseline">
-                    <h3 className="text-2xl font-bold">{card.value}</h3>
-                    <p className="ml-2 text-sm text-muted-foreground">{card.description}</p>
-                  </div>
+              <div className="flex items-center space-x-2">
+                <div className={`p-2 rounded-lg ${card.bgColor}`}>
+                  <card.icon className={`h-4 w-4 ${card.color}`} />
                 </div>
-                <div className={`p-3 rounded-full ${card.bgColor} ${card.color}`}>
-                  <card.icon className="h-5 w-5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
+                  <p className="text-2xl font-bold">{card.value}</p>
+                  <p className="text-xs text-muted-foreground">{card.description}</p>
                 </div>
               </div>
             </CardContent>
@@ -121,69 +120,19 @@ export default function DashboardPage() {
         ))}
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="md:col-span-1">
-          <CardHeader className="pb-2">
-            <CardTitle>Weekly Goal Progress</CardTitle>
-            <CardDescription>Your progress towards your weekly fitness goals</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Workouts Completed</div>
-                  <div className="text-sm text-muted-foreground">5/7 days</div>
-                </div>
-                <Progress value={71} />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Calories Burned</div>
-                  <div className="text-sm text-muted-foreground">4,320/5,000 kcal</div>
-                </div>
-                <Progress value={86} />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Water Intake</div>
-                  <div className="text-sm text-muted-foreground">2.4/3.0 L</div>
-                </div>
-                <Progress value={80} />
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm font-medium">Steps</div>
-                  <div className="text-sm text-muted-foreground">8,456/10,000 steps</div>
-                </div>
-                <Progress value={85} />
-              </div>
-            </div>
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" size="sm" className="w-full">
-              <CalendarRange className="mr-2 h-4 w-4" />
-              View All Goals
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card className="md:col-span-1">
-          <CardHeader className="pb-2">
-            <CardTitle>Progress Tracking</CardTitle>
-            <CardDescription>Track your weekly progress</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="weight">
-              <div className="flex items-center justify-between mb-4">
-                <TabsList>
-                  <TabsTrigger value="weight">Weight</TabsTrigger>
-                  <TabsTrigger value="calories">Calories</TabsTrigger>
-                </TabsList>
-              </div>
-              <TabsContent value="weight" className="mt-0">
+      {/* Progress Chart */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Weekly Progress</CardTitle>
+          <CardDescription>Track your weight and calorie intake over the week</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue="weight" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="weight">Weight</TabsTrigger>
+              <TabsTrigger value="calories">Calories</TabsTrigger>
+            </TabsList>
+            <TabsContent value="weight" className="mt-0">
               <ChartContainer
                 config={{
                   weight: {
@@ -210,8 +159,8 @@ export default function DashboardPage() {
                   </LineChart>
                 </ResponsiveContainer>
               </ChartContainer>
-              </TabsContent>
-              <TabsContent value="calories" className="mt-0">
+            </TabsContent>
+            <TabsContent value="calories" className="mt-0">
               <ChartContainer
                 config={{
                   calories: {
@@ -238,17 +187,16 @@ export default function DashboardPage() {
                   </LineChart>
                 </ResponsiveContainer>
               </ChartContainer>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-          <CardFooter>
-            <Button variant="outline" size="sm" className="w-full" disabled>
-              <TrendingUp className="mr-2 h-4 w-4" />
-              Progress Tracking (Coming Soon)
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+        <CardFooter>
+          <Button variant="outline" size="sm" className="w-full" disabled>
+            <TrendingUp className="mr-2 h-4 w-4" />
+            Progress Tracking (Coming Soon)
+          </Button>
+        </CardFooter>
+      </Card>
 
       <Card>
         <CardHeader>

@@ -114,7 +114,7 @@ export default function CommunityPage() {
     }
 
     fetchData()
-  }, [activeTab, page, user?.id, toast])
+  }, [activeTab, page, user?.id])
 
   useEffect(() => {
     const fetchBuddiesAndChallenges = async () => {
@@ -194,7 +194,7 @@ export default function CommunityPage() {
     }
 
     fetchBuddiesAndChallenges()
-  }, [activeTab, toast])
+  }, [activeTab])
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]

@@ -394,7 +394,7 @@ export default function MyWorkoutsPage() {
               <Dumbbell className="mx-auto h-12 w-12 text-muted-foreground opacity-20" />
               <h3 className="mt-4 text-lg font-medium">No workouts found</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                You haven't created any {activeTab !== "all" ? activeTab : ""} workouts yet.
+                You haven&apos;t created any {activeTab !== "all" ? activeTab : ""} workouts yet.
               </p>
               <Button className="mt-4" onClick={() => setIsCreating(true)}>
                 <Plus className="mr-2 h-4 w-4" />

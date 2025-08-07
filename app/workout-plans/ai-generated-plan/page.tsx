@@ -247,7 +247,7 @@ export default function AIGeneratedPlanPage() {
     }
 
     fetchWorkoutPlan()
-  }, [toast])
+  }, [])
 
   const handleSaveWorkout = () => {
     toast.success("Workout plan saved", {
@@ -306,7 +306,7 @@ export default function AIGeneratedPlanPage() {
           </Button>
           <h1 className="text-2xl font-bold">Workout Plan Not Found</h1>
         </div>
-        <p>The workout plan you're looking for doesn't exist or has been removed.</p>
+                        <p>The workout plan you&apos;re looking for doesn&apos;t exist or has been removed.</p>
         <Button className="mt-4" onClick={() => router.push("/workout-plans")}>
           Back to Workout Plans
         </Button>

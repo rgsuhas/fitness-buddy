@@ -151,7 +151,7 @@ export default function WearablesPage() {
     }
 
     fetchData()
-  }, [toast])
+  }, [])
 
   const handleSyncDevices = () => {
     setLoading(true)
@@ -259,7 +259,7 @@ export default function WearablesPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardHeader>
-                <CardTitle>Today's Activity</CardTitle>
+                <CardTitle>Today&apos;s Activity</CardTitle>
                 <CardDescription>Your activity metrics for today</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">

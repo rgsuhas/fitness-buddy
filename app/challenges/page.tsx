@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { Card, CardContent, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -218,10 +219,12 @@ export default function ChallengesPage() {
                   <Card className="group cursor-pointer hover:shadow-md transition-shadow">
                     <div className="h-[200px] overflow-hidden">
                       {challenge.imageUrl ? (
-                        <img
+                        <Image
                           src={challenge.imageUrl}
                           alt={challenge.title}
-                          className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                          layout="fill"
+                          objectFit="cover"
+                          className="transition-transform group-hover:scale-105"
                         />
                       ) : (
                         <PlaceholderImage width={400} height={200} className="group-hover:scale-105" />

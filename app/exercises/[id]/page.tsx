@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -114,7 +115,7 @@ export default function ExerciseDetailPage() {
     if (params.id) {
       fetchExerciseDetails()
     }
-  }, [params.id, toast])
+  }, [params.id])
 
   const handleSaveExercise = () => {
     setSaved(!saved)
@@ -168,7 +169,7 @@ export default function ExerciseDetailPage() {
           </Button>
           <h1 className="text-2xl font-bold">Exercise Not Found</h1>
         </div>
-        <p>The exercise you're looking for doesn't exist or has been removed.</p>
+        <p>The exercise you&apos;re looking for doesn&apos;t exist or has been removed.</p>
         <Button className="mt-4" onClick={() => router.push("/exercises")}>
           Back to Exercises
         </Button>
@@ -187,10 +188,12 @@ export default function ExerciseDetailPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="rounded-lg overflow-hidden relative group">
-          <img
+          <Image
             src={exercise.imageUrl || "/placeholder.svg?height=400&width=600"}
             alt={exercise.name}
-            className="w-full h-[400px] object-cover"
+            layout="fill"
+            objectFit="cover"
+            className="w-full h-[400px]"
           />
           {exercise.videoUrl && (
             <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/50">
@@ -288,7 +291,7 @@ export default function ExerciseDetailPage() {
             </CardContent>
             <CardFooter>
               <p className="text-sm text-muted-foreground">
-                Always consult with a fitness professional if you're unsure about proper form.
+                Always consult with a fitness professional if you&apos;re unsure about proper form.
               </p>
             </CardFooter>
           </Card>
@@ -298,11 +301,12 @@ export default function ExerciseDetailPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {exercise.relatedExercises.map((relatedExercise) => (
               <Card key={relatedExercise.id} className="overflow-hidden">
-                <div className="h-[200px] overflow-hidden">
-                  <img
+                <div className="h-[200px] overflow-hidden relative">
+                  <Image
                     src={relatedExercise.imageUrl || "/placeholder.svg?height=200&width=300"}
                     alt={relatedExercise.name}
-                    className="h-full w-full object-cover"
+                    layout="fill"
+                    objectFit="cover"
                   />
                 </div>
                 <CardHeader className="p-4">

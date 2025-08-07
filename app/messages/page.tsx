@@ -138,7 +138,7 @@ export default function MessagesPage() {
         clearInterval(intervalId)
       }
     }
-  }, [user, toast]) // Only re-run when user or toast changes
+  }, [user]) // Only re-run when user changes
 
   // Fetch messages when active conversation changes
   useEffect(() => {
@@ -171,7 +171,7 @@ export default function MessagesPage() {
     }
 
     fetchMessages()
-  }, [activeConversation, toast, user, activeUser])
+  }, [activeConversation, user, activeUser])
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()

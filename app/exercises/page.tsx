@@ -77,7 +77,7 @@ export default function ExercisesPage() {
     }
 
     fetchExercises()
-  }, [toast])
+  }, [])
 
   const filteredExercises = exercises.filter((exercise) => {
     const matchesSearch = exercise.name.toLowerCase().includes(searchQuery.toLowerCase())

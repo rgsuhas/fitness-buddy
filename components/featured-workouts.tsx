@@ -46,7 +46,7 @@ export function FeaturedWorkouts() {
     };
 
     fetchWorkouts();
-  }, [toast]);
+  }, []);
 
   if (error) {
     return (

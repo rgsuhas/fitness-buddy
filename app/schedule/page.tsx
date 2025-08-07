@@ -221,7 +221,7 @@ export default function SchedulePage() {
                   <div className="text-muted-foreground">
                     <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <h3 className="text-lg font-medium mb-2">No workouts scheduled</h3>
-                    <p className="text-sm">Click "Add Workout" to schedule a session for this day</p>
+                    <p className="text-sm">Click &quot;Add Workout&quot; to schedule a session for this day</p>
                   </div>
                 </div>
               ) : (

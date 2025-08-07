@@ -97,7 +97,7 @@ export default function DashboardPage() {
     <div className="container py-6 space-y-8">
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user?.name?.split(" ")[0] || "User"}</h1>
-        <p className="text-muted-foreground">Here's an overview of your fitness journey</p>
+        <p className="text-muted-foreground">Here&apos;s an overview of your fitness journey</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">

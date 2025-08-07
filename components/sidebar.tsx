@@ -78,11 +78,6 @@ export function Sidebar() {
       icon: Sparkles,
     },
     {
-      title: "Progress",
-      href: "/progress",
-      icon: LineChart,
-    },
-    {
       title: "Schedule",
       href: "/schedule",
       icon: Calendar,
@@ -94,7 +89,7 @@ export function Sidebar() {
     },
     {
       title: "Challenges",
-      href: "/my-challenges",
+      href: "/challenges",
       icon: Trophy,
     },
     {

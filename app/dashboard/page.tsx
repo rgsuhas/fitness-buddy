@@ -242,12 +242,10 @@ export default function DashboardPage() {
             </Tabs>
           </CardContent>
           <CardFooter>
-            <Link href="/progress" className="w-full">
-              <Button variant="outline" size="sm" className="w-full">
-                <TrendingUp className="mr-2 h-4 w-4" />
-                View Detailed Progress
-              </Button>
-            </Link>
+            <Button variant="outline" size="sm" className="w-full" disabled>
+              <TrendingUp className="mr-2 h-4 w-4" />
+              Progress Tracking (Coming Soon)
+            </Button>
           </CardFooter>
         </Card>
       </div>

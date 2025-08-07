@@ -1,13 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Card, CardContent, CardDescription, CardFooter, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Sparkles, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { Sparkles } from "lucide-react"
+import { LoadingSpinner } from "./loading-spinner"
 
 interface Workout {
   id: string
@@ -21,77 +22,109 @@ interface Workout {
 }
 
 export function WorkoutRecommendations() {
-  
+  const [workouts, setWorkouts] = useState<Workout[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // TODO: Add API endpoint: GET /api/workouts/recommendations
-  // Expected response: { workouts: Workout[] }
-  // This should fetch personalized workout recommendations based on user preferences
-  const [workouts, setWorkouts] = useState<Workout[]>([
-    {
-      id: "rec1",
-      title: "Upper Body Focus",
-      description: "Tailored for your strength goals with progressive resistance",
-      level: "intermediate",
-      duration: 45,
-      category: "Strength",
-      imageUrl: "/images/workout-1.jpg",
-    },
-    {
-      id: "rec2",
-      title: "HIIT Recovery",
-      description: "Low-impact but effective high-intensity interval training",
-      level: "beginner",
-      duration: 30,
-      category: "Cardio",
-      imageUrl: "/images/workout-2.jpg",
-      aiGenerated: true,
-    },
-    {
-      id: "rec3",
-      title: "Mobility & Flexibility",
-      description: "Improve range of motion and prevent injuries",
-      level: "beginner",
-      duration: 25,
-      category: "Recovery",
-      imageUrl: "/images/workout-3.jpg",
-    },
-  ])
-
-  const handleGenerateCustomWorkout = async () => {
-    try {
-      toast.info("Generating workout...", {
-        description: "Our AI is creating a personalized workout plan for you.",
-      })
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/workouts/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userPreferences: {
-            fitnessLevel: 'intermediate',
-            goals: ['strength', 'endurance'],
-            equipment: ['dumbbells', 'bodyweight'],
-            timeAvailable: 50
-          }
-        })
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to generate workout')
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        
+        // Simulate API call with delay
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        // Mock data - in production, this would be an API call
+        const mockWorkouts: Workout[] = [
+          {
+            id: "rec1",
+            title: "Upper Body Focus",
+            description: "Tailored for your strength goals with progressive resistance",
+            level: "intermediate",
+            duration: 45,
+            category: "Strength",
+            imageUrl: "/images/workout-1.jpg",
+          },
+          {
+            id: "rec2",
+            title: "HIIT Recovery",
+            description: "Low-impact but effective high-intensity interval training",
+            level: "beginner",
+            duration: 30,
+            category: "Cardio",
+            imageUrl: "/images/workout-2.jpg",
+            aiGenerated: true,
+          },
+          {
+            id: "rec3",
+            title: "Mobility & Flexibility",
+            description: "Improve range of motion and prevent injuries",
+            level: "beginner",
+            duration: 25,
+            category: "Recovery",
+            imageUrl: "/images/workout-3.jpg",
+          },
+        ]
+        
+        setWorkouts(mockWorkouts)
+      } catch (err) {
+        console.error("Failed to fetch workout recommendations:", err)
+        setError("Failed to load recommendations")
+        toast.error("Failed to load workout recommendations")
+      } finally {
+        setLoading(false)
       }
-
-      const data = await response.json()
-      setWorkouts([data, ...workouts])
-
-      toast.success("Custom workout created!", {
-        description: "Your personalized workout plan is now ready.",
-      })
-    } catch (error) {
-      console.error("Error generating workout:", error)
-      toast.error("Generation failed", {
-        description: "We couldn't generate a custom workout. Please try again later.",
-      })
     }
+
+    fetchRecommendations()
+  }, [])
+
+  const handleGenerateCustomWorkout = () => {
+    toast.info("Custom workout generation", {
+      description: "This feature will be available soon!",
+    })
+  }
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+          <div>
+            <h3 className="text-lg font-medium">Personalized for your goals</h3>
+            <p className="text-sm text-muted-foreground">Based on your activity level and preferences</p>
+          </div>
+          <Button disabled>
+            <Sparkles className="mr-2 h-4 w-4" />
+            Generate Custom Workout
+          </Button>
+        </div>
+        <LoadingSpinner text="Loading recommendations..." />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+          <div>
+            <h3 className="text-lg font-medium">Personalized for your goals</h3>
+            <p className="text-sm text-muted-foreground">Based on your activity level and preferences</p>
+          </div>
+          <Button onClick={handleGenerateCustomWorkout}>
+            <Sparkles className="mr-2 h-4 w-4" />
+            Generate Custom Workout
+          </Button>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-muted-foreground mb-4">{error}</p>
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -132,18 +165,22 @@ export function WorkoutRecommendations() {
                 <CardTitle className="text-lg mb-1">{workout.title}</CardTitle>
                 <CardDescription className="line-clamp-2">{workout.description}</CardDescription>
               </CardContent>
-              <CardFooter className="p-4 pt-0 flex justify-between text-sm border-t">
-                <Badge
-                  variant={
-                    workout.level === "beginner"
-                      ? "secondary"
-                      : workout.level === "intermediate"
-                        ? "default"
-                        : "destructive"
-                  }
-                >
-                  {workout.level}
-                </Badge>
+              <CardFooter className="p-4 pt-0 flex justify-between text-sm">
+                <div className="flex items-center">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="w-4 h-4 text-yellow-500 mr-1"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  4.8
+                </div>
                 <div className="text-muted-foreground">
                   {workout.duration} min · {workout.category}
                 </div>

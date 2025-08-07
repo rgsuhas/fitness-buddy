@@ -45,7 +45,24 @@ export default function Header() {
       }`}
     >
       <div className="container flex h-16 items-center justify-between px-4">
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
+          {/* Mobile menu button - only show when user is logged in */}
+          {user && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              {mobileMenuOpen ? (
+                <X className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <Menu className="h-5 w-5" aria-hidden="true" />
+              )}
+            </Button>
+          )}
+
           <Link href="/" className="flex items-center space-x-2">
             <span className="text-2xl font-bold">
               <span className="text-primary">Fitness</span>Buddy
@@ -53,16 +70,16 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:ml-10 md:flex md:space-x-8">
-            <Link href="/workouts" className="text-sm font-medium hover:text-primary">
+            <Link href="/workouts" className="text-sm font-medium hover:text-primary transition-colors">
               Workouts
             </Link>
-            <Link href="/exercises" className="text-sm font-medium hover:text-primary">
+            <Link href="/exercises" className="text-sm font-medium hover:text-primary transition-colors">
               Exercises
             </Link>
-            <Link href="/challenges" className="text-sm font-medium hover:text-primary">
+            <Link href="/challenges" className="text-sm font-medium hover:text-primary transition-colors">
               Challenges
             </Link>
-            <Link href="/community" className="text-sm font-medium hover:text-primary">
+            <Link href="/community" className="text-sm font-medium hover:text-primary transition-colors">
               Community
             </Link>
           </nav>
@@ -133,19 +150,6 @@ export default function Header() {
               )}
             </>
           )}
-
-          <button
-            type="button"
-            className="md:hidden inline-flex items-center justify-center"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <span className="sr-only">Open main menu</span>
-            {mobileMenuOpen ? (
-              <X className="h-6 w-6" aria-hidden="true" />
-            ) : (
-              <Menu className="h-6 w-6" aria-hidden="true" />
-            )}
-          </button>
         </div>
       </div>
 
@@ -155,28 +159,28 @@ export default function Header() {
           <div className="space-y-1 px-4 py-4">
             <Link
               href="/workouts"
-              className="block py-2 text-base font-medium hover:text-primary"
+              className="block py-2 text-base font-medium hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Workouts
             </Link>
             <Link
               href="/exercises"
-              className="block py-2 text-base font-medium hover:text-primary"
+              className="block py-2 text-base font-medium hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Exercises
             </Link>
             <Link
               href="/challenges"
-              className="block py-2 text-base font-medium hover:text-primary"
+              className="block py-2 text-base font-medium hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Challenges
             </Link>
             <Link
               href="/community"
-              className="block py-2 text-base font-medium hover:text-primary"
+              className="block py-2 text-base font-medium hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Community
@@ -184,7 +188,7 @@ export default function Header() {
             {!user && !loading && (
               <Link
                 href="/auth/register"
-                className="block py-2 text-base font-medium hover:text-primary sm:hidden"
+                className="block py-2 text-base font-medium hover:text-primary transition-colors sm:hidden"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Sign Up
